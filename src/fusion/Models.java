@@ -54,7 +54,7 @@ public class Models {
 		}
 	}
 	
-	static Vector<Vector<Float>> transpose(Vector<Vector<Float>> vect) {
+	public static Vector<Vector<Float>> transpose(Vector<Vector<Float>> vect) {
 		Vector<Vector<Float>> transposed = new Vector<>();
 		for (int i = 0; i < vect.get(0).size(); i++)
 			transposed.add(new Vector<Float>());

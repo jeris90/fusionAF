@@ -1,7 +1,9 @@
-package fusion;
+package fusion.aggregation;
 
 import java.util.Collections;
 import java.util.Vector;
+
+import fusion.Models;
 
 //LexiMin aggregation function
 public class AggregateLexiMin extends AggregationFunction {

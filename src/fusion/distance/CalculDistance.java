@@ -1,9 +1,11 @@
-package fusion;
+package fusion.distance;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Vector;
+
+import fusion.Models;
 import net.sf.jargsemsat.jargsemsat.datastructures.DungAF;
 
 public class CalculDistance {

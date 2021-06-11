@@ -1,6 +1,8 @@
-package fusion;
+package fusion.aggregation;
 
 import java.util.Vector;
+
+import fusion.Models;
 // Sum aggregation function 
 public class AggregateSum extends AggregationFunction{
     @Override

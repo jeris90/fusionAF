@@ -1,4 +1,4 @@
-package fusion;
+package fusion.distance;
 import java.util.Collection;
 
 public class DistanceHamming extends Distance {

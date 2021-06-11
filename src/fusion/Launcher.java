@@ -10,6 +10,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
+import fusion.aggregation.AggregateLexiMax;
+import fusion.aggregation.AggregateLexiMin;
+import fusion.aggregation.AggregateMax;
+import fusion.aggregation.AggregateMean;
+import fusion.aggregation.AggregateMed;
+import fusion.aggregation.AggregateMin;
+import fusion.aggregation.AggregateMul;
+import fusion.aggregation.AggregateSum;
+import fusion.aggregation.AggregationFunction;
+import fusion.distance.CalculDistance;
+import fusion.distance.Distance;
+import fusion.distance.DistanceHamming;
+import fusion.parser.ReadingFiles;
 import net.sf.jargsemsat.jargsemsat.datastructures.*;
 
 public class Launcher {

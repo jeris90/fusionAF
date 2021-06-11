@@ -1,6 +1,8 @@
-package fusion;
+package fusion.aggregation;
 
 import java.util.Vector;
+
+import fusion.Models;
 //Maximum aggregation function
 public class AggregateMax extends AggregationFunction {
 	@Override

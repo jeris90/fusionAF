@@ -1,6 +1,8 @@
-package fusion;
+package fusion.aggregation;
 
 import java.util.Vector;
+
+import fusion.Models;
 //Mean aggregation function
 public class AggregateMean extends AggregationFunction {
 

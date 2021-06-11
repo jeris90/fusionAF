@@ -1,6 +1,8 @@
-package fusion;
+package fusion.aggregation;
 
 import java.util.Vector;
+
+import fusion.Models;
 //aggregation function multiplication
 public class AggregateMul extends AggregationFunction{
     @Override
