@@ -24,7 +24,7 @@ public class Launcher {
 			System.out.println("Usage: jarfile <af_path> <constrain_path> <distance> <aggregation_function>");
 			System.out.println("\taf_path: The path to the tgf af file.");
 			System.out.println("\tconstrain_path: The path to the constrain file.");
-			System.out.println("\tdistace: Distance type one of: \"HM\" for Hamming, \"LV\" for Leveinshtein.");
+			System.out.println("\tdistance: Distance type one of: \"HM\" for Hamming, \"LV\" for Leveinshtein.");
 			System.out.println(
 					"\taggregation_function: SUM for sum, MIN for Minimum, MAX for Maximum, MUL for Multiplication, MEAN for mean,"
 							+ " MED for Mediane, LMIN for LexiMin, LMAX for LexiMax.");
