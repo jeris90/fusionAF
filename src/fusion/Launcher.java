@@ -90,7 +90,7 @@ public class Launcher {
 		long tempsDebut = System.nanoTime(); 
 		// Reading model
 		Collection<Collection<String>> model = ReadingFiles
-				.transformModels(ReadingFiles.readingConstraint(args_d.get(1)));
+				.transformModels(ReadingFiles.readConstraint(args_d.get(1)));
 		Models mod = new Models(model);
 		String sem = new String();
 		

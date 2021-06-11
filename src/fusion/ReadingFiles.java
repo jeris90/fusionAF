@@ -29,6 +29,12 @@ import net.sf.jargsemsat.jargsemsat.datastructures.DungAF;
 
 public abstract class ReadingFiles {
 
+	/**
+	 * Splits the textual representation of a list of arguments/literals
+	 * 
+	 * @param line
+	 * @return
+	 */
 	public static List<String> stringToHashset(String line) {
 		return Arrays.asList((line.replaceAll("[\\[\\] ]", "").split(",")));
 	}
@@ -57,22 +63,35 @@ public abstract class ReadingFiles {
 		return res;
 	}
 
+	/**
+	 * Provides a textual representation of a clause, using the dimacs format.
+	 * 
+	 * @param clause the clause
+	 * @return the dimacs representation of the clause
+	 */
 	public static String formatCNF(int[] clause) {
-		String chaine = "";
+		String dimacsClause = "";
 		for (int i = 0; i < clause.length; i++) {
-			chaine = chaine + String.valueOf(clause[i] * (-1) + " ");
+			dimacsClause = dimacsClause + String.valueOf(clause[i] * (-1) + " ");
 		}
-		// return "\n" + chaine + "0";
-		return chaine + "0\n";
+
+		return dimacsClause + "0\n";
 	}
 
-	// Function for reading the Afs
-	public static void readingAF(Vector<String> argument, Vector<String[]> atts, String af_file) {
-		argument.clear();
-		atts.clear();
+	/**
+	 * Reads an AF from a TGF file. The data read from the file are stored in the
+	 * parameters arguments and attacks.
+	 * 
+	 * @param arguments the Vector<String> where the arguments are stored
+	 * @param attacks   the Vector<String[]> where the attacks are stored
+	 * @param afFile    the tgf file describing the AF
+	 */
+	public static void readingTGF(Vector<String> arguments, Vector<String[]> attacks, String afFile) {
+		arguments.clear();
+		attacks.clear();
 		String file_arguments = new String();
 		// path to the file to be read
-		String link = new String(af_file);
+		String link = new String(afFile);
 		String[] splited = new String[2];
 		Boolean attaque = false;
 		BufferedReader reader;
@@ -87,10 +106,10 @@ public abstract class ReadingFiles {
 					} else {
 						file_arguments = line;
 						if (attaque == false) {
-							argument.add(file_arguments);
+							arguments.add(file_arguments);
 						} else {
 							splited = file_arguments.split(" ");
-							atts.add(splited);
+							attacks.add(splited);
 						}
 					}
 				} catch (NumberFormatException e) {
@@ -104,6 +123,12 @@ public abstract class ReadingFiles {
 
 	}
 
+	/**
+	 * Copy the content of a file into another one
+	 * 
+	 * @param file1 the source file
+	 * @param file2 the target file
+	 */
 	public static void copyOfFile(String file1, String file2) {
 		FileInputStream instream = null;
 		FileOutputStream outstream = null;
@@ -126,13 +151,19 @@ public abstract class ReadingFiles {
 		}
 	}
 
-	public static void addClause(String clause, String cnf_file) {
+	/**
+	 * Adds a clause to a dimacs file
+	 * 
+	 * @param clause  the clause
+	 * @param cnfFile the dimacs file
+	 */
+	public static void addClause(String clause, String cnfFile) {
 		List<String> lines = new ArrayList<String>();
 		String line = null;
 		int nb_clause;
 		try {
 			// Reading the file to replace the number of clauses
-			File f1 = new File(cnf_file);
+			File f1 = new File(cnfFile);
 			FileReader fr = new FileReader(f1);
 			BufferedReader br = new BufferedReader(fr);
 			while ((line = br.readLine()) != null) {
@@ -186,6 +217,11 @@ public abstract class ReadingFiles {
 	 * return modeles; }
 	 */
 
+	/**
+	 * Prints an array of integer in a humanly readable way.
+	 * 
+	 * @param tab
+	 */
 	public static void printTab(int[] tab) {
 		System.out.print("\t[");
 		for (int i = 0; i < tab.length; i++) {
@@ -194,6 +230,13 @@ public abstract class ReadingFiles {
 		System.out.println("]");
 	}
 
+	/**
+	 * Method that allows to obtain one model of a constraint
+	 * 
+	 * @param cnfFile the dimacs file that represents the constraint
+	 * @return one model of the constraint
+	 * @throws IOException
+	 */
 	public static int[] findModel(String cnfFile) throws IOException {
 		int[] solution = {};
 		ISolver solver = SolverFactory.newDefault();
@@ -235,7 +278,7 @@ public abstract class ReadingFiles {
 	 * @return the models of the constraint
 	 * @throws IOException
 	 */
-	public static Vector<int[]> readingConstraint(String cnf_file) throws IOException {
+	public static Vector<int[]> readConstraint(String cnf_file) throws IOException {
 		String cnf_use_file = "Sat_run.txt";
 		copyOfFile(cnf_file, cnf_use_file);
 		Vector<int[]> modeles = new Vector<>();
@@ -296,7 +339,9 @@ public abstract class ReadingFiles {
 	}
 
 	/**
-	 * Transforms one model of the integrity constraint (given as a int[]) into a textual representation
+	 * Transforms one model of the integrity constraint (given as a int[]) into a
+	 * textual representation
+	 * 
 	 * @param vec the model
 	 * @return the String representation of the model
 	 */
@@ -310,31 +355,39 @@ public abstract class ReadingFiles {
 		return chaine + "]";
 	}
 
-	// read all afs files in our folder
-	public static Vector<DungAF> Lectures(String af_folder) {
+	/**
+	 * Reads all the AFs contained in a given directory
+	 * 
+	 * @param afDirectory the directory where the AF files are stored
+	 * @return the AFs
+	 */
+	public static Vector<DungAF> Lectures(String afDirectory) {
 		Vector<String> argument = new Vector<String>();
 		Vector<String[]> atts = new Vector<String[]>();
 		Vector<DungAF> afs = new Vector<DungAF>();
 		// Reading Af's files
-		File dir = new File(af_folder);
+		File dir = new File(afDirectory);
 		File[] liste = dir.listFiles();
 		for (File item : liste) {
 			if (item.isFile()) {
-				readingAF(argument, atts, item.getAbsolutePath());
-				// Cr&ate de l'af
+				readingTGF(argument, atts, item.getAbsolutePath());
 				DungAF af = new DungAF(argument, atts);
-				// add the Af to the set of Afs
 				afs.add(af);
 			}
 		}
 		return afs;
 	}
 
-	// Retrieve file names
-	public static Vector<String> nameFile(String af_folder) {
+	/**
+	 * Retrieve file names from a directory of AF files
+	 * 
+	 * @param afDirectory
+	 * @return
+	 */
+	public static Vector<String> nameFile(String afDirectory) {
 		Vector<String> listFile = new Vector<String>();
 		String it = new String();
-		File dir = new File(af_folder);
+		File dir = new File(afDirectory);
 		File[] liste = dir.listFiles();
 		for (File item : liste) {
 			if (item.isFile()) {
