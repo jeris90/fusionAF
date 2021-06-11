@@ -26,17 +26,17 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 
 public class ConstraintManager {
-	
+
 	/**
 	 * Read the integrity constraint stored in a dimacs file, and returns its models
 	 * 
-	 * @param cnf_file the dimacs file representing the constraint
+	 * @param cnfFile the dimacs file representing the constraint
 	 * @return the models of the constraint
 	 * @throws IOException
 	 */
-	public static Vector<int[]> readConstraint(String cnf_file) throws IOException {
+	public static Vector<int[]> readConstraint(String cnfFile) throws IOException {
 		String cnf_use_file = "Sat_run.txt";
-		copyOfFile(cnf_file, cnf_use_file);
+		copyOfFile(cnfFile, cnf_use_file);
 		Vector<int[]> modeles = new Vector<>();
 
 		int[] solution = findModel(cnf_use_file);
@@ -66,7 +66,7 @@ public class ConstraintManager {
 			outstream = new FileOutputStream(outfile);
 			byte[] buffer = new byte[1024];
 			int length;
-	
+
 			while ((length = instream.read(buffer)) > 0) {
 				outstream.write(buffer, 0, length);
 			}
@@ -95,11 +95,11 @@ public class ConstraintManager {
 			if (problem.isSatisfiable()) {
 				// System.out.println("Satisfiable !");
 				solution = problem.findModel();
-	
+
 				// Complete the model if needed
 				if (solution.length < problem.nVars())
 					solution = fillModel(solution, problem.nVars());
-	
+
 			}
 			/*
 			 * else { System.out.println("Unsatisfiable !"); }
@@ -115,7 +115,7 @@ public class ConstraintManager {
 		} catch (TimeoutException e) {
 			System.out.println("Timeout, sorry!");
 		}
-	
+
 		return solution;
 	}
 
@@ -130,7 +130,7 @@ public class ConstraintManager {
 		for (int i = 0; i < clause.length; i++) {
 			dimacsClause = dimacsClause + String.valueOf(clause[i] * (-1) + " ");
 		}
-	
+
 		return dimacsClause + "0\n";
 	}
 
@@ -166,11 +166,11 @@ public class ConstraintManager {
 			for (String s : lines) {
 				bw.write(s + "\n");
 			}
-	
+
 			bw.write(clause);
-	
+
 			bw.flush();
-	
+
 			bw.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -187,12 +187,12 @@ public class ConstraintManager {
 	 */
 	public static int[] fillModel(int[] clause, int nbVar) {
 		int[] res = new int[nbVar];
-	
+
 		// We instantiate the clause by setting the negation of all literals
 		for (int i = 0; i < res.length; i++) {
 			res[i] = i + 1;
 		}
-	
+
 		// And we add the fixed literals (positive or negative) in the clause
 		for (int j = 0; j < clause.length; j++) {
 			int litt = Math.abs(clause[j]) - 1;
@@ -218,6 +218,10 @@ public class ConstraintManager {
 			formatModels.add(stringToHashset(line));
 		}
 		return formatModels;
+	}
+
+	public static Collection<Collection<String>> getModels(String cnfFile) throws IOException {
+		return transformModels(readConstraint(cnfFile));
 	}
 
 	/**

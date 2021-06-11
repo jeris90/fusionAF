@@ -79,7 +79,7 @@ public abstract class AFParser {
 	 * @param afDirectory the directory where the AF files are stored
 	 * @return the AFs
 	 */
-	public static Vector<DungAF> Lectures(String afDirectory) {
+	public static Vector<DungAF> readAFDirectory(String afDirectory) {
 		Vector<String> argument = new Vector<String>();
 		Vector<String[]> atts = new Vector<String[]>();
 		Vector<DungAF> afs = new Vector<DungAF>();
@@ -102,7 +102,7 @@ public abstract class AFParser {
 	 * @param afDirectory
 	 * @return
 	 */
-	public static Vector<String> nameFile(String afDirectory) {
+	public static Vector<String> getFileNames(String afDirectory) {
 		Vector<String> listFile = new Vector<String>();
 		String it = new String();
 		File dir = new File(afDirectory);
