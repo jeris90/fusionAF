@@ -5,7 +5,17 @@ import java.util.Vector;
 //LexiMin aggregation function
 public class AggregateLexiMin extends Aggregate_Function {
 
-
+	/***
+	 * Lexicographically compares two vectors (starting from the beginning to apply the leximin) containing the same number of elements.
+	 * For instance, [1,2,3] >_lex [0,1,2]
+	 * 				 [4,2,1] >_lex [4,2,0]
+	 * 				 [3,3,1] =_lex [3,3,1] 
+	 * @param vec1 a vector containing n positive real numbers
+	 * @param vec2 another vector containing n positive real numbers
+	 * @return 1 if vec1 >_lex vec2
+	 * 		  -1 if vec2 >_lex vec1
+	 * 		   0 if vec1 = vec2 
+	 */
 	public static Vector<Vector<Float>> cmpareVec(Vector<Float> vec1, Vector<Vector<Float>> vec2) {
 		for (int i = 0; i < vec2.size(); i++) {
 			for (int j = 0; j < vec2.get(i).size(); j++) {
