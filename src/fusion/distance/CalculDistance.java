@@ -48,7 +48,7 @@ public class CalculDistance {
 			Min_distance.clear();
 		}
 		
-		mod.setDistance(vec_distance);
+		mod.addDistance(vec_distance);
 	}
 
 }

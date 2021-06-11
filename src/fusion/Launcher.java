@@ -193,7 +193,7 @@ public class Launcher {
 				ind++;
 			}
 			// System.out.println("Distance for each candidate : " + resultat);
-			vec_candidats = mod.getCandidats(resultat);
+			vec_candidats = mod.getCandidates(resultat);
 			System.out.println(
 					"\nThe result of the aggregation is the following set of sets of arguments : " + vec_candidats);
 
