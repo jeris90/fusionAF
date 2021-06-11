@@ -22,8 +22,9 @@ import fusion.aggregation.AggregationFunction;
 import fusion.distance.CalculDistance;
 import fusion.distance.Distance;
 import fusion.distance.DistanceHamming;
-import fusion.parser.ReadingFiles;
-import net.sf.jargsemsat.jargsemsat.datastructures.*;
+import fusion.parser.ConstraintManager;
+import fusion.parser.AFParser;
+import net.sf.jargsemsat.jargsemsat.datastructures.DungAF;
 
 public class Launcher {
 	static Vector<Float> resultat = new Vector<>();
@@ -102,19 +103,19 @@ public class Launcher {
 		//Calculation of execution time
 		long tempsDebut = System.nanoTime(); 
 		// Reading model
-		Collection<Collection<String>> model = ReadingFiles
-				.transformModels(ReadingFiles.readConstraint(args_d.get(1)));
+		Collection<Collection<String>> model = ConstraintManager
+				.transformModels(ConstraintManager.readConstraint(args_d.get(1)));
 		Models mod = new Models(model);
 		String sem = new String();
 		
-		Vector<String> fileName = ReadingFiles.nameFile(args_d.get(0));
+		Vector<String> fileName = AFParser.nameFile(args_d.get(0));
 		boolean supported = true;
 		int j = 0;
 		
 		mod.printModel();
 		//if there is no constraint file
 		if(mod.getModels().isEmpty()) {
-			for (DungAF af : ReadingFiles.Lectures(args_d.get(0))) {
+			for (DungAF af : AFParser.Lectures(args_d.get(0))) {
 				if(addMod){
                      model = toCollec(af.getArguments());
                      mod = new Models(model);
@@ -127,7 +128,7 @@ public class Launcher {
 		}
 		else {
 			//if there is a constraint file
-			for (DungAF af : ReadingFiles.Lectures(args_d.get(0))) {
+			for (DungAF af : AFParser.Lectures(args_d.get(0))) {
 				mainFunc(fileName, af, mod, sem, distance, supported, j);
 				j++;
 			}
