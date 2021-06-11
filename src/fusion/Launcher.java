@@ -55,7 +55,7 @@ public class Launcher {
 			System.err.println("Error distance \"" + args_d.get(2) + "\" not handled");
 			return;
 		}
-		Aggregate_Function as = null;
+		AggregationFunction as = null;
 
 		switch (args_d.get(3)) {
 		case "SUM":
@@ -90,7 +90,7 @@ public class Launcher {
 		long tempsDebut = System.nanoTime(); 
 		// Reading model
 		Collection<Collection<String>> model = ReadingFiles
-				.transformeModeles(ReadingFiles.readingConstrainte(args_d.get(1)));
+				.transformModels(ReadingFiles.readingConstraint(args_d.get(1)));
 		Models mod = new Models(model);
 		String sem = new String();
 		
@@ -98,7 +98,7 @@ public class Launcher {
 		boolean supported = true;
 		int j = 0;
 		
-		mod.afficheModel();
+		mod.printModel();
 		//if there is no constraint file
 		if(mod.getModels().isEmpty()) {
 			for (DungAF af : ReadingFiles.Lectures(args_d.get(0))) {
@@ -165,10 +165,10 @@ public class Launcher {
 				CalculDistance.calculDistance(af, mod, distance, sem);
 			}
 	
-	    public static void mainAgregate(Models mod, Aggregate_Function agg_function, boolean supported){
+	    public static void mainAgregate(Models mod, AggregationFunction agg_function, boolean supported){
 	    		int ind = 0;
 		    	if (supported) {
-					resultat = agg_function.choosenAggregate(mod);
+					resultat = agg_function.aggregate(mod);
 					
 					System.out.println("\nResults from the chosen aggregation function for each candidate :");
 					for(Collection<String> cand : mod.getModels()) {

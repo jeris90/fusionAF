@@ -2,9 +2,9 @@ package fusion;
 
 import java.util.Vector;
 // Sum aggregation function 
-public class AggregateSum extends Aggregate_Function{
+public class AggregateSum extends AggregationFunction{
     @Override
-    public Vector<Float> choosenAggregate(Models mod) {
+    public Vector<Float> aggregate(Models mod) {
         Vector<Float> sum = new Vector<>();
         for(Vector<Float> model : mod.getDistance())
         	for(int i = 0; i<model.size(); i++)

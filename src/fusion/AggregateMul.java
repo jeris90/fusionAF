@@ -2,9 +2,9 @@ package fusion;
 
 import java.util.Vector;
 //aggregation function multiplication
-public class AggregateMul extends Aggregate_Function{
+public class AggregateMul extends AggregationFunction{
     @Override
-    public Vector<Float> choosenAggregate(Models mod) {
+    public Vector<Float> aggregate(Models mod) {
         Vector<Float> mul = new Vector<>();
         for(Vector<Float> model : mod.getDistance()) {
         	for(int i = 0; i<model.size(); i++)

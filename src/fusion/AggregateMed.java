@@ -3,7 +3,7 @@ package fusion;
 import java.util.Collections;
 import java.util.Vector;
 //Median aggregation function
-public class AggregateMed extends Aggregate_Function {
+public class AggregateMed extends AggregationFunction {
 
 	public static double findMedian(Vector<Float> vector) {
 		Collections.sort(vector);
@@ -14,7 +14,7 @@ public class AggregateMed extends Aggregate_Function {
 	}
 
 	@Override
-	public Vector<Float> choosenAggregate(Models mod) {
+	public Vector<Float> aggregate(Models mod) {
 		Vector<Float> vecMedaine = new Vector<>();
 		for (Vector<Float> model : Models.transpose(mod.getDistance())) {
 			float med = (float) findMedian(model);

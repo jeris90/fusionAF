@@ -2,10 +2,10 @@ package fusion;
 
 import java.util.Vector;
 //Mean aggregation function
-public class AggregateMean extends Aggregate_Function {
+public class AggregateMean extends AggregationFunction {
 
 	@Override
-	public Vector<Float> choosenAggregate(Models mod) {
+	public Vector<Float> aggregate(Models mod) {
 		Vector<Float> result = new Vector<>();
 		
 		float sum;

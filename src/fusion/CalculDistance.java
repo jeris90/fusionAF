@@ -36,7 +36,7 @@ public class CalculDistance {
 			}
 			
 			for (Collection<String> current_ext : ext) {
-				dist = distance.choosenDistance(current_ext, current_mod);
+				dist = distance.computeDistance(current_ext, current_mod);
 				// vector to find the minimum distance of a model
 				Min_distance.addElement(dist);
 			}

@@ -44,7 +44,7 @@ public class Models {
 	/***
 	 * Print the candidate(s) (if it/they exist(s))
 	 */
-	public void afficheModel() {
+	public void printModel() {
 		if(this.models.isEmpty()) {
 			System.out.println("There is no candidate for the aggregation (i.e. the integrity constraint has no model).");
 		}

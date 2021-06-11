@@ -2,9 +2,9 @@ package fusion;
 
 import java.util.Vector;
 //Maximum aggregation function
-public class AggregateMax extends Aggregate_Function {
+public class AggregateMax extends AggregationFunction {
 	@Override
-	public Vector<Float> choosenAggregate(Models mod) {
+	public Vector<Float> aggregate(Models mod) {
 		Vector<Float> max = new Vector<>();
 		for (Vector<Float> model : mod.getDistance())
 			for (int i = 0; i < model.size(); i++)
