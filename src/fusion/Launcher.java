@@ -1,13 +1,7 @@
 package fusion;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.cli.CommandLine;
@@ -48,6 +42,8 @@ public class Launcher {
 	private static String aggregation_function = "SUM";
 	
 	private static String task = "EE";
+	
+	private static String arg = null;
 	
 	private static boolean print = false; 
 	
@@ -155,15 +151,12 @@ public class Launcher {
 		resultat = agg_function.aggregate(mod);
 
 		System.out.println("\nResults from the chosen aggregation function for each candidate :");
-		for (Collection<String> cand : mod.getModels()) {
-			System.out.println(cand + " : " + resultat.get(ind));
+		for (Collection<String> candidate : mod.getModels()) {
+			System.out.println(candidate + " : " + resultat.get(ind));
 			ind++;
 		}
-		// System.out.println("Distance for each candidate : " + resultat);
-		vec_candidats = mod.getCandidates(resultat);
-		System.out.println("\nThe result of the aggregation is the following set of sets of arguments : " + vec_candidats);
-
 		
+		vec_candidats = mod.getCandidates(resultat);	
 	}
 	
 	public static void main(String args[]) throws IOException {
@@ -207,7 +200,11 @@ public class Launcher {
 				}
 				else {
 					if(line.getOptionValue("p").equals("EE")) {
-						System.out.println("-a option is omitted because -p EE option does not need a specific argument.");
+						System.out.println("-a option is omitted because -p EE does not need a specific argument.");
+					}
+					else {
+						arg = line.getOptionValue("a");
+						System.out.println("Argument : " + arg);
 					}
 						
 				}
@@ -288,7 +285,7 @@ public class Launcher {
 		
 		// Reading model
 		Collection<Collection<String>> mod = null;
-		if(path_constraint == null) { 		// if no integrity constraints have been provided
+		if(path_constraint == null) { 		// if no integrity constraint has been provided
 			mod = ConstraintManager.fullModels(profile_afs.get(0).getArguments());
 		}
 		else {        						// otherwise, the models of the integrity constraint are calculated
@@ -299,7 +296,7 @@ public class Launcher {
 		
 		models.printModel();
 		
-		if(models.getModels().isEmpty()) {		// if there are no models, the result of the merge will necessarily be empty
+		if(models.getModels().isEmpty()) {		// if there are no models, the result of the aggregation is necessarily empty
 			System.out.println("The integrity constraint has no model so the result of the aggregation is empty.");
 			System.exit(1);
 		}
@@ -309,11 +306,22 @@ public class Launcher {
 			DungAF af = profile_afs.get(j);
 			String semantics = extractSemantics(fileNameAFs.get(j));
 			
-			CalculDistance.calculDistance(af, models, distance, semantics); // compute the distance of each model with a given AF for a given semantics
+			CalculDistance.computeDistance(af, models, distance, semantics); // compute the distance of each model with a given AF for a given semantics
 		}
 		
-
 		aggregation(models, as);
+		
+
+		System.out.println("\nThe result of the aggregation is the following set of sets of arguments : ");	
+		
+		Results result = new Results(vec_candidats);
+		
+		if(task.equals("EE")) {
+			System.out.println(result.printExtensionsEnumeration());
+		}
+		else {
+			System.out.println(result.printAcceptance(task,arg));
+		}
 
 		long tempsFin = System.nanoTime();
 		double seconds = (tempsFin - tempsDebut) / 1e9;

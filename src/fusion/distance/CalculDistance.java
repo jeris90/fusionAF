@@ -37,14 +37,22 @@ public class CalculDistance {
 				ext = af.getSemiStableExts();
 				break;
 			default:
-				System.err.println("Error concerning an unknown extension of a file containing an AF.");
+				System.err.println("Error concerning an unknown extension of a file containing an AF : " + ext);
 				System.exit(1);
 		}
 		
 		return ext;
 	}
 	
-	public static void calculDistance(DungAF af, Models mod, Distance distance, String semantic) {
+	/***
+	 * This method computes, for a given AF, its set of extensions w.r.t. a given semantics before calculating its distance to 
+	 * each existing model (candidate). 
+	 * @param af
+	 * @param models
+	 * @param distance
+	 * @param semantic
+	 */
+	public static void computeDistance(DungAF af, Models models, Distance distance, String semantic) {
 		float dist = 0;
 		Object min = null;
 		Vector<Float> vec_distance = new Vector<Float>();
@@ -55,7 +63,7 @@ public class CalculDistance {
 		System.out.println(extensions);
 		
 		// browse the models
-		for (Collection<String> current_mod : mod.getModels()) {
+		for (Collection<String> current_mod : models.getModels()) {
 			for (Collection<String> current_ext : extensions) {
 				dist = distance.computeDistance(current_ext, current_mod);
 				min_distance.addElement(dist);
@@ -66,7 +74,7 @@ public class CalculDistance {
 			min_distance.clear();
 		}
 		
-		mod.addDistance(vec_distance);
+		models.addDistance(vec_distance);
 	}
 
 }
