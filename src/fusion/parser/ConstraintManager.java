@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.sat4j.minisat.SolverFactory;
@@ -222,6 +223,32 @@ public class ConstraintManager {
 
 	public static Collection<Collection<String>> getModels(String cnfFile) throws IOException {
 		return transformModels(readConstraint(cnfFile));
+	}
+	
+	/***
+	 * Return the power set of a set of arguments. This method is used if no integrity constraint is provided.
+	 * @param setArguments A set of arguments
+	 * @return the power set of setArguments
+	 */
+	public static Collection<Collection<String>> fullModels(Collection<String> setArguments){
+		Collection<Collection<String>> models = new HashSet<Collection<String>>();
+		
+		if(setArguments.isEmpty()) {
+			models.add(new HashSet<String>());
+			return models;
+		}
+		List<String> list = new ArrayList<String>(setArguments);
+		
+		String head = list.get(0);
+	    Collection<String> rest = new HashSet<String>(list.subList(1, list.size())); 
+	    for (Collection<String> set : fullModels(rest)) {
+	        Set<String> newSet = new HashSet<String>();
+	        newSet.add(head);
+	        newSet.addAll(set);
+	        models.add(newSet);
+	        models.add(set);
+	    }   
+		return models;
 	}
 
 	/**

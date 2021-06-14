@@ -2,6 +2,7 @@ package fusion;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Vector;
 
 public class Models {
@@ -26,6 +27,7 @@ public class Models {
 	public Models(Collection<Collection<String>> models) {
 		this.models = models;
 	}
+	
 
 	/**
 	 * 
@@ -51,7 +53,7 @@ public class Models {
 	}
 
 	/**
-	 * This method allows to get the the minimal models of the constraint, with
+	 * This method allows to get the minimal models of the constraint, with
 	 * respect to a vector of scores (that should correspond to the aggregated
 	 * distances).
 	 * 
@@ -79,14 +81,10 @@ public class Models {
 	 * Print the candidate(s) (if it/they exist(s))
 	 */
 	public void printModel() {
-		if (this.models.isEmpty()) {
-			System.out
-					.println("There is no candidate for the aggregation (i.e. the integrity constraint has no model).");
-		} else {
-			System.out.print(this.models.size() + " candidate(s) for the aggregation : ");
-			System.out.println(this.models);
-		}
+		System.out.print(this.models.size() + " candidate(s) for the aggregation : ");
+		System.out.println(this.models);
 	}
+	
 
 	/**
 	 * Transposes the matrix of distances, such that each Vector<Float> corresponds

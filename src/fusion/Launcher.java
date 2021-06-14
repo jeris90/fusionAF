@@ -49,6 +49,8 @@ public class Launcher {
 	
 	private static String task = "EE";
 	
+	private static boolean print = false; 
+	
 
 	public static void help(Options options) {
 		System.out.println("Usage: jarfile -dir <af_path> -CI <constrain_path> -D <distance> -AGG <aggregation_function>");
@@ -63,7 +65,7 @@ public class Launcher {
 	
 	private static Options configParameters() {
 		
-		Option dirProfileFileOption = Option.builder("dir") 
+		Option profileDirectoryOption = Option.builder("dir") 
 	            .longOpt("dir_profile") //
 	            .desc("Path of the directory containing the profile of AFs") 
 	            .hasArg(true) 
@@ -79,7 +81,7 @@ public class Launcher {
 	            .required(false)
 	            .build();
 		
-		Option distanceFileOption = Option.builder("D") 
+		Option distanceOption = Option.builder("D") 
 	            .longOpt("distance") //
 	            .desc("Distance used to compare a candidate and a set of extensions (HM for the Hamming Distance).") 
 	            .hasArg(true) 
@@ -87,7 +89,7 @@ public class Launcher {
 	            .required(false)
 	            .build();
 		
-		Option aggregationFunctionFileOption = Option.builder("AGG") 
+		Option aggregationFunctionOption = Option.builder("AGG") 
 	            .longOpt("agg_function") //
 	            .desc("Aggregation function used to aggregate the score of a candidate and the set of extensions of each AFs in the profile."
 	            		+ "SUM for sum, MIN for Minimum, MAX for Maximum, MUL for Multiplication, MEAN for mean"
@@ -97,21 +99,38 @@ public class Launcher {
 	            .required(false)
 	            .build();
 		
-		Option outputFunctionFileOption = Option.builder("p") 
+		Option outputFunctionOption = Option.builder("p") 
 	            .longOpt("output") //
 	            .desc("Choice of the task to be carried out by the programme (EE for extensions enumeration, DC for credulous acceptance for a given argument, DS for skeptical acceptance for a given argument).") 
 	            .hasArg(true) 
 	            .argName("output")
 	            .required(false)
 	            .build();
+		
+		Option argumentOption = Option.builder("a") 
+	            .longOpt("arg") //
+	            .desc("Option mandatory with the option -p DC or DS to specify the targeted argument.") 
+	            .hasArg(true) 
+	            .argName("argument")
+	            .required(false)
+	            .build();
+		
+		Option printOption = Option.builder("print") 
+	            .desc("Prints all details of the aggregation process ") 
+	            .hasArg(false) 
+	            .argName("print")
+	            .required(false)
+	            .build();
 	
 		Options options = new Options();
 		
-		options.addOption(dirProfileFileOption);
+		options.addOption(profileDirectoryOption);
 		options.addOption(constraintFileOption);
-		options.addOption(distanceFileOption);
-		options.addOption(aggregationFunctionFileOption);
-		options.addOption(outputFunctionFileOption);
+		options.addOption(distanceOption);
+		options.addOption(aggregationFunctionOption);
+		options.addOption(outputFunctionOption);
+		options.addOption(argumentOption);
+		options.addOption(printOption);
 		
 		return options;
 	}
@@ -150,6 +169,26 @@ public class Launcher {
 				System.out.println("Task : " + task);
 			}
 			
+			
+			if (line.hasOption("a")) {
+				if(!line.hasOption("p")) {
+					System.out.println("-a option is omitted because -p option is missing.");
+				}
+				else {
+					if(line.getOptionValue("p").equals("EE")) {
+						System.out.println("-a option is omitted because -p EE option does not need a specific argument.");
+					}
+						
+				}
+			}
+			
+			if(line.hasOption("print")) {
+				print = true;
+				System.out.println("Print details : " + print);
+			}
+			
+			System.out.println("\n");
+			
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error parsing command-line arguments!\n");
@@ -158,36 +197,19 @@ public class Launcher {
 			System.exit(1);
 		}
 
-		/*
-		List<String> args_d = null;
-		if (args.length != 4) {
-			help();
-			args_d = Arrays.asList("Afs", "constraint.txt", "HM", "SUM");
-		} else
-			args_d = Arrays.asList(args);
-
-		if (!(new File(args_d.get(0))).isDirectory()) {
-			System.out.println("\"" + args_d.get(0) + "\" is not a valid file");
-			return;
-		}
-		if (!Files.isWritable(Paths.get(args_d.get(1)))) {
-			System.out.println("\"" + args_d.get(1) + "\" is not a valid file");
-			return;
-		}
-		*/
-
+		
 		Distance distance = null;
 		switch (dist) {
-		case "HM":
-			distance = new DistanceHamming();
-			break;
-		/*
-		 * case "LV": distance = new DistanceLevenshtein(); break;
-		 */
-		default:
-			System.err.println("Error distance \"" + dist + "\" not handled. \n");
-			help(options);
-			return;
+			case "HM":
+				distance = new DistanceHamming();
+				break;
+			/*
+			 * case "LV": distance = new DistanceLevenshtein(); break;
+			 */
+			default:
+				System.err.println("Error distance \"" + dist + "\" not handled. \n");
+				help(options);
+				return;
 		}
 		
 		
@@ -224,36 +246,40 @@ public class Launcher {
 				help(options);
 				return;
 		}
+		
+		
 		// Calculation of execution time
 		long tempsDebut = System.nanoTime();
-		// Reading model
-		Collection<Collection<String>> model = ConstraintManager.getModels(path_constraint);
-		Models mod = new Models(model);
-		String sem = new String();
-
+		
+		// Import a profile of AFs 
+		Vector<DungAF> profile_afs= AFParser.readAFDirectory(path_profile);
 		Vector<String> fileName = AFParser.getFileNames(path_profile);
+		
+		// Reading model
+		Collection<Collection<String>> model = null;
+		if(path_constraint == null) { 		// if no integrity constraints have been provided
+			model = ConstraintManager.fullModels(profile_afs.get(0).getArguments());
+		}
+		else {        						// otherwise, the models of the integrity constraint are calculated
+			model = ConstraintManager.getModels(path_constraint);
+		}
+		
+		Models mod = new Models(model);
+		mod.printModel();
+		
+		if(mod.getModels().isEmpty()) {		// if there are no models, the result of the merge will necessarily be empty
+			System.out.println("The integrity constraint has no model so the result of the aggregation is empty.");
+			System.exit(1);
+		}
+		
+		
+		String sem = new String();
 		boolean supported = true;
 		int j = 0;
 
-		mod.printModel();
-		// if there is no constraint file
-		if (mod.getModels().isEmpty()) {
-			for (DungAF af : AFParser.readAFDirectory(path_profile)) {
-				if (addMod) {
-					model = toCollec(af.getArguments());
-					mod = new Models(model);
-					addMod = false;
-				}
-				mainFunc(fileName, af, mod, sem, distance, supported, j);
-				j++;
-			}
-
-		} else {
-			// if there is a constraint file
-			for (DungAF af : AFParser.readAFDirectory(path_profile)) {
-				mainFunc(fileName, af, mod, sem, distance, supported, j);
-				j++;
-			}
+		for (DungAF af : profile_afs) {
+			mainFunc(fileName, af, mod, sem, distance, supported, j);
+			j++;
 		}
 
 		mainAgregate(mod, as, supported);
@@ -263,12 +289,8 @@ public class Launcher {
 		System.out.println();
 		System.out.println("Pour " + path_profile + " Arguments Opération effectuée en: " + seconds + " secondes.");
 	}
-
-	public static Collection<Collection<String>> toCollec(Collection<String> defaultModel) {
-		Collection<Collection<String>> returnStat = new HashSet<Collection<String>>();
-		returnStat.add(defaultModel);
-		return returnStat;
-	}
+	
+	
 
 	public static void mainFunc(Vector<String> fileName, DungAF af, Models mod, String sem, Distance distance,
 			boolean supported, int j) {
@@ -297,7 +319,6 @@ public class Launcher {
 				}
 			}
 		}
-
 		// calculating distance
 		CalculDistance.calculDistance(af, mod, distance, sem);
 	}
