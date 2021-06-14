@@ -135,6 +135,37 @@ public class Launcher {
 		return options;
 	}
 
+	
+	/***
+	 * Extract the extension of a file. The extension is used to know which semantics applied to the AF.
+	 * @param fileName_af the file containing the AF
+	 * @return the extension of the file
+	 */
+	public static String extractSemantics(String fileName_af) {
+		
+		String sem = fileName_af.substring(fileName_af.lastIndexOf(".") + 1);
+		
+		System.out.format("****************  " + fileName_af + "  *************** \n");
+		
+		return sem;	
+	}
+
+	public static void aggregation(Models mod, AggregationFunction agg_function) {
+		int ind = 0;
+		resultat = agg_function.aggregate(mod);
+
+		System.out.println("\nResults from the chosen aggregation function for each candidate :");
+		for (Collection<String> cand : mod.getModels()) {
+			System.out.println(cand + " : " + resultat.get(ind));
+			ind++;
+		}
+		// System.out.println("Distance for each candidate : " + resultat);
+		vec_candidats = mod.getCandidates(resultat);
+		System.out.println("\nThe result of the aggregation is the following set of sets of arguments : " + vec_candidats);
+
+		
+	}
+	
 	public static void main(String args[]) throws IOException {
 				
 		Options options = configParameters();
@@ -253,94 +284,40 @@ public class Launcher {
 		
 		// Import a profile of AFs 
 		Vector<DungAF> profile_afs= AFParser.readAFDirectory(path_profile);
-		Vector<String> fileName = AFParser.getFileNames(path_profile);
+		Vector<String> fileNameAFs = AFParser.getFileNames(path_profile);
 		
 		// Reading model
-		Collection<Collection<String>> model = null;
+		Collection<Collection<String>> mod = null;
 		if(path_constraint == null) { 		// if no integrity constraints have been provided
-			model = ConstraintManager.fullModels(profile_afs.get(0).getArguments());
+			mod = ConstraintManager.fullModels(profile_afs.get(0).getArguments());
 		}
 		else {        						// otherwise, the models of the integrity constraint are calculated
-			model = ConstraintManager.getModels(path_constraint);
+			mod = ConstraintManager.getModels(path_constraint);
 		}
 		
-		Models mod = new Models(model);
-		mod.printModel();
+		Models models = new Models(mod);
 		
-		if(mod.getModels().isEmpty()) {		// if there are no models, the result of the merge will necessarily be empty
+		models.printModel();
+		
+		if(models.getModels().isEmpty()) {		// if there are no models, the result of the merge will necessarily be empty
 			System.out.println("The integrity constraint has no model so the result of the aggregation is empty.");
 			System.exit(1);
 		}
 		
 		
-		String sem = new String();
-		boolean supported = true;
-		int j = 0;
-
-		for (DungAF af : profile_afs) {
-			mainFunc(fileName, af, mod, sem, distance, supported, j);
-			j++;
+		for(int j = 0 ; j<profile_afs.size() ; j++) { // for each AF in the profile
+			DungAF af = profile_afs.get(j);
+			String semantics = extractSemantics(fileNameAFs.get(j));
+			
+			CalculDistance.calculDistance(af, models, distance, semantics); // compute the distance of each model with a given AF for a given semantics
 		}
+		
 
-		mainAgregate(mod, as, supported);
+		aggregation(models, as);
 
 		long tempsFin = System.nanoTime();
 		double seconds = (tempsFin - tempsDebut) / 1e9;
 		System.out.println();
 		System.out.println("Pour " + path_profile + " Arguments Opération effectuée en: " + seconds + " secondes.");
 	}
-	
-	
-
-	public static void mainFunc(Vector<String> fileName, DungAF af, Models mod, String sem, Distance distance,
-			boolean supported, int j) {
-		System.out.format("****************  " + fileName.get(j) + "  *************** \n");
-		if (fileName.get(j).toString().endsWith("co")) {
-			sem = "CO";
-		} else {
-			if (fileName.get(j).toString().endsWith("gr")) {
-				sem = "GR";
-			} else {
-				if (fileName.get(j).toString().endsWith("st")) {
-					sem = "ST";
-				} else {
-					if (fileName.get(j).toString().endsWith("pr")) {
-						sem = "PR";
-					} else {
-						if (fileName.get(j).toString().endsWith("txt") || fileName.get(j).toString().endsWith("tgf")) {
-							sem = "CO";
-						} else {
-							System.err.println("file extension not supported : " + fileName.get(j).toString()
-									+ "\nsupported extentions: .co for complet, .pr for preferred, gr for grounded, st for stable ");
-							supported = false;
-							return;
-						}
-					}
-				}
-			}
-		}
-		// calculating distance
-		CalculDistance.calculDistance(af, mod, distance, sem);
-	}
-
-	public static void mainAgregate(Models mod, AggregationFunction agg_function, boolean supported) {
-		int ind = 0;
-		if (supported) {
-			resultat = agg_function.aggregate(mod);
-
-			System.out.println("\nResults from the chosen aggregation function for each candidate :");
-			for (Collection<String> cand : mod.getModels()) {
-				System.out.println(cand + " : " + resultat.get(ind));
-				ind++;
-			}
-			// System.out.println("Distance for each candidate : " + resultat);
-			vec_candidats = mod.getCandidates(resultat);
-			System.out.println(
-					"\nThe result of the aggregation is the following set of sets of arguments : " + vec_candidats);
-
-		} else {
-			System.err.println("Interruped process file extension not supported ");
-		}
-	}
-
 }
