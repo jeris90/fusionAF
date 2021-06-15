@@ -7,6 +7,7 @@ import java.util.Vector;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -33,6 +34,8 @@ public class Launcher {
 	static Collection<Collection<String>> vec_candidats = new Vector<>();
 	static boolean addMod = true;
 	
+	private static Vector<DungAF> profile_afs = null;
+	
 	private static String path_profile = null;
 	
 	private static String path_constraint = null;
@@ -49,21 +52,26 @@ public class Launcher {
 	
 
 	public static void help(Options options) {
-		System.out.println("Usage: jarfile -dir <af_path> -CI <constrain_path> -D <distance> -AGG <aggregation_function>");
+		/*System.out.println("Usage: jarfile -dir <af_path> -CI <constrain_path> -D <distance> -AGG <aggregation_function>");
 		System.out.println("\t<af_path>: " + options.getOption("dir").getDescription());
 		System.out.println("\t<constrain_path>: " + options.getOption("CI").getDescription());
 		System.out.println("\t<distance>: " + options.getOption("D").getDescription());
 		System.out.println(
 				"\t<aggregation_function>: " + options.getOption("AGG").getDescription());
 		System.out.println(
-				"The default parameters used are : <distance> = HM, <aggregation_function> = SUM ");
+				"The default parameters used are : <distance> = HM, <aggregation_function> = SUM ");*/
+		
+		final HelpFormatter formatter = new HelpFormatter();
+	    formatter.printHelp("jarfile", options, true);
+	    
+	    System.out.println("\nDefault parameters : <distance> = HM, <aggregation_function> = SUM, <output> = EE");
 	}
 	
 	private static Options configParameters() {
 		
 		Option profileDirectoryOption = Option.builder("dir") 
 	            .longOpt("dir_profile") //
-	            .desc("Path of the directory containing the profile of AFs") 
+	            .desc("[Mandatory] Path of the directory containing the profile of AFs.") 
 	            .hasArg(true) 
 	            .argName("dir_profile")
 	            .required(true)
@@ -71,7 +79,8 @@ public class Launcher {
 		
 		Option constraintFileOption = Option.builder("CI") 
 	            .longOpt("int_constraint") //
-	            .desc("Path of the file containing the integrity constraint (dimacs format)") 
+	            .desc("Path of the file containing the integrity constraint (dimacs format). If not provided, then the integrity constraint " +
+	            		"is a tautology (i.e. the set of candidates is the power set of the set of arguments).") 
 	            .hasArg(true) 
 	            .argName("int_constraint")
 	            .required(false)
@@ -79,7 +88,7 @@ public class Launcher {
 		
 		Option distanceOption = Option.builder("D") 
 	            .longOpt("distance") //
-	            .desc("Distance used to compare a candidate and a set of extensions (HM for the Hamming Distance).") 
+	            .desc("Distance used to compare a candidate and a set of extensions. [HM for the Hamming Distance].") 
 	            .hasArg(true) 
 	            .argName("distance")
 	            .required(false)
@@ -88,8 +97,8 @@ public class Launcher {
 		Option aggregationFunctionOption = Option.builder("AGG") 
 	            .longOpt("agg_function") //
 	            .desc("Aggregation function used to aggregate the score of a candidate and the set of extensions of each AFs in the profile."
-	            		+ "SUM for sum, MIN for Minimum, MAX for Maximum, MUL for Multiplication, MEAN for mean"
-	            		+ " MED for Mediane, LMIN for LexiMin, LMAX for LexiMax.") 
+	            		+ "[SUM for sum, MIN for minimum, MAX for maximum, MUL for multiplication, MEAN for mean"
+	            		+ " MED for mediane, LMIN for leximin, LMAX for leximax]") 
 	            .hasArg(true) 
 	            .argName("agg_function")
 	            .required(false)
@@ -112,9 +121,16 @@ public class Launcher {
 	            .build();
 		
 		Option printOption = Option.builder("print") 
-	            .desc("Prints all details of the aggregation process ") 
+	            .desc("Prints all details of the aggregation process.") 
 	            .hasArg(false) 
 	            .argName("print")
+	            .required(false)
+	            .build();
+		
+		Option printHelp = Option.builder("h") 
+	            .longOpt("help") //
+	            .desc("Help option.") 
+	            .hasArg(false) 
 	            .required(false)
 	            .build();
 	
@@ -127,6 +143,87 @@ public class Launcher {
 		options.addOption(outputFunctionOption);
 		options.addOption(argumentOption);
 		options.addOption(printOption);
+		options.addOption(printHelp);
+		
+		return options;
+	}
+	
+	private static Options commandLineManagement(String args[]) {
+		
+		Options options = configParameters();
+		
+		CommandLineParser parser = new DefaultParser();
+		CommandLine line = null;
+		try {
+			line = parser.parse(options, args);
+			
+			if (line.hasOption("dir")) {
+				path_profile = line.getOptionValue("dir");
+				System.out.println("PATH : " + path_profile);
+				profile_afs = AFParser.readAFDirectory(path_profile);
+			}
+			
+			if (line.hasOption("CI")) {
+				path_constraint = line.getOptionValue("CI");
+				System.out.println("CI : " + path_constraint);
+			}
+			
+			if (line.hasOption("D")) {
+				dist = line.getOptionValue("D");
+				System.out.println("Distance : " + dist);
+			}
+			
+			if (line.hasOption("AGG")) {
+				aggregation_function = line.getOptionValue("AGG");
+				System.out.println("Aggregation function : " + aggregation_function);
+			}
+			
+			if (line.hasOption("p")) {
+				task = line.getOptionValue("p");
+				System.out.println("Task : " + task);
+			}
+			
+			
+			if (line.hasOption("a")) {
+				if(!profile_afs.get(0).getArguments().contains(arg)) { // Check if the argument belongs to the set of arguments shared by the profile of AFs
+					System.err.println("Unknown argument for the option -a. \nList of arguments : " + profile_afs.get(0).getArguments());
+					System.exit(1);
+				}
+				
+				if(!line.hasOption("p")) {
+					System.out.println("-a option is omitted because -p option is missing.");
+				}
+				else {
+					if(line.getOptionValue("p").equals("EE")) {
+						System.out.println("-a option is omitted because -p EE does not need a specific argument.");
+					}
+					else {
+						arg = line.getOptionValue("a");
+						System.out.println("Argument : " + arg);
+					}
+						
+				}
+			}
+			
+			if(line.hasOption("print")) {
+				print = true;
+				System.out.println("Print details : " + print);
+			}
+			
+			if(line.hasOption("h")) {
+				help(options);
+				System.exit(0);
+			}
+			
+			System.out.println("\n");
+			
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Error parsing command-line arguments!\n");
+			help(options);
+			//e.printStackTrace();
+			System.exit(1);
+		}
 		
 		return options;
 	}
@@ -161,71 +258,11 @@ public class Launcher {
 	
 	public static void main(String args[]) throws IOException {
 				
-		Options options = configParameters();
+		// OPTIONS
+		Options options = commandLineManagement(args);
 		
-		CommandLineParser parser = new DefaultParser();
-		CommandLine line = null;
-		try {
-			line = parser.parse(options, args);
-			
-			if (line.hasOption("dir")) {
-				path_profile = line.getOptionValue("dir");
-				System.out.println("PATH : " + path_profile);
-			}
-			
-			if (line.hasOption("CI")) {
-				path_constraint = line.getOptionValue("CI");
-				System.out.println("CI : " + path_constraint);
-			}
-			
-			if (line.hasOption("D")) {
-				dist = line.getOptionValue("D");
-				System.out.println("Distance : " + dist);
-			}
-			
-			if (line.hasOption("AGG")) {
-				aggregation_function = line.getOptionValue("AGG");
-				System.out.println("Aggregation function : " + aggregation_function);
-			}
-			
-			if (line.hasOption("p")) {
-				task = line.getOptionValue("p");
-				System.out.println("Task : " + task);
-			}
-			
-			
-			if (line.hasOption("a")) {
-				if(!line.hasOption("p")) {
-					System.out.println("-a option is omitted because -p option is missing.");
-				}
-				else {
-					if(line.getOptionValue("p").equals("EE")) {
-						System.out.println("-a option is omitted because -p EE does not need a specific argument.");
-					}
-					else {
-						arg = line.getOptionValue("a");
-						System.out.println("Argument : " + arg);
-					}
-						
-				}
-			}
-			
-			if(line.hasOption("print")) {
-				print = true;
-				System.out.println("Print details : " + print);
-			}
-			
-			System.out.println("\n");
-			
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Error parsing command-line arguments!\n");
-			help(options);
-			//e.printStackTrace();
-			System.exit(1);
-		}
-
 		
+		// DISTANCE
 		Distance distance = null;
 		switch (dist) {
 			case "HM":
@@ -241,7 +278,7 @@ public class Launcher {
 		}
 		
 		
-		
+		// AGGREGATION FUNCTION
 		AggregationFunction as = null;
 
 		switch (aggregation_function) {
@@ -279,9 +316,6 @@ public class Launcher {
 		// Calculation of execution time
 		long tempsDebut = System.nanoTime();
 		
-		// Import a profile of AFs 
-		Vector<DungAF> profile_afs= AFParser.readAFDirectory(path_profile);
-		Vector<String> fileNameAFs = AFParser.getFileNames(path_profile);
 		
 		// Reading model
 		Collection<Collection<String>> mod = null;
@@ -301,6 +335,8 @@ public class Launcher {
 			System.exit(1);
 		}
 		
+		// Store the name of each file containing an AF (to extract the extension later) 
+		Vector<String> fileNameAFs = AFParser.getFileNames(path_profile);
 		
 		for(int j = 0 ; j<profile_afs.size() ; j++) { // for each AF in the profile
 			DungAF af = profile_afs.get(j);
@@ -312,7 +348,7 @@ public class Launcher {
 		aggregation(models, as);
 		
 
-		System.out.println("\nThe result of the aggregation is the following set of sets of arguments : ");	
+		System.out.print("\nResult : ");	
 		
 		Results result = new Results(vec_candidats);
 		
@@ -320,12 +356,17 @@ public class Launcher {
 			System.out.println(result.printExtensionsEnumeration());
 		}
 		else {
-			System.out.println(result.printAcceptance(task,arg));
+			if(task.equals("DC") || task.equals("DS")) {
+				System.out.println(result.printAcceptance(task,arg));
+			}
+			else {
+				System.err.println("Unknown argument for the option -p.");
+			}
 		}
 
 		long tempsFin = System.nanoTime();
 		double seconds = (tempsFin - tempsDebut) / 1e9;
 		System.out.println();
-		System.out.println("Pour " + path_profile + " Arguments Opération effectuée en: " + seconds + " secondes.");
+		System.out.println("Time : " + seconds + " sec");
 	}
 }
