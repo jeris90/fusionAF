@@ -16,7 +16,7 @@ import fusion.aggregation.AggregationFactory;
 import fusion.aggregation.AggregationFunction;
 import fusion.distance.CalculDistance;
 import fusion.distance.Distance;
-import fusion.distance.DistanceHamming;
+import fusion.distance.DistanceFactory;
 import fusion.parser.AFParser;
 import fusion.parser.ConstraintManager;
 import net.sf.jargsemsat.jargsemsat.datastructures.DungAF;
@@ -256,19 +256,19 @@ public class Launcher {
 		
 		
 		// DISTANCE
-		Distance distance = null;
-		switch (dist) {
-			case "HM":
-				distance = new DistanceHamming();
-				break;
-			/*
-			 * case "LV": distance = new DistanceLevenshtein(); break;
-			 */
-			default:
-				System.err.println("Error distance \"" + dist + "\" not handled. \n");
-				help(options);
-				return;
-		}
+		Distance distance = new DistanceFactory().makeDistance(dist);
+//		switch (dist) {
+//			case "HM":
+//				distance = new DistanceHamming();
+//				break;
+//			/*
+//			 * case "LV": distance = new DistanceLevenshtein(); break;
+//			 */
+//			default:
+//				System.err.println("Error distance \"" + dist + "\" not handled. \n");
+//				help(options);
+//				return;
+//		}
 		
 		
 		// AGGREGATION FUNCTION
