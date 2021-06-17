@@ -341,7 +341,7 @@ public class Launcher {
 		aggregation(models, as);
 		
 
-		System.out.print("\nResult : ");	
+		System.out.print("\nResult : \n");	
 		
 		Results result = new Results(vec_candidats);
 		
