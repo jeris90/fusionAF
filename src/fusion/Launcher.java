@@ -12,20 +12,13 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import fusion.aggregation.AggregateLexiMax;
-import fusion.aggregation.AggregateLexiMin;
-import fusion.aggregation.AggregateMax;
-import fusion.aggregation.AggregateMean;
-import fusion.aggregation.AggregateMed;
-import fusion.aggregation.AggregateMin;
-import fusion.aggregation.AggregateMul;
-import fusion.aggregation.AggregateSum;
+import fusion.aggregation.AggregationFactory;
 import fusion.aggregation.AggregationFunction;
 import fusion.distance.CalculDistance;
 import fusion.distance.Distance;
 import fusion.distance.DistanceHamming;
-import fusion.parser.ConstraintManager;
 import fusion.parser.AFParser;
+import fusion.parser.ConstraintManager;
 import net.sf.jargsemsat.jargsemsat.datastructures.DungAF;
 
 
@@ -279,38 +272,38 @@ public class Launcher {
 		
 		
 		// AGGREGATION FUNCTION
-		AggregationFunction as = null;
+		AggregationFunction as = new AggregationFactory().makeAggregation(aggregation_function);
 
-		switch (aggregation_function) {
-			case "SUM":
-				as = new AggregateSum();
-				break;
-			case "MIN":
-				as = new AggregateMin();
-				break;
-			case "MAX":
-				as = new AggregateMax();
-				break;
-			case "MUL":
-				as = new AggregateMul();
-				break;
-			case "MEAN":
-				as = new AggregateMean();
-				break;
-			case "LMIN":
-				as = new AggregateLexiMin();
-				break;
-			case "MED":
-				as = new AggregateMed();
-				break;
-			case "LMAX":
-				as = new AggregateLexiMax();
-				break;
-			default:
-				System.err.println("Error Agregation function \"" + aggregation_function + "\" not handled");
-				help(options);
-				return;
-		}
+//		switch (aggregation_function) {
+//			case "SUM":
+//				as = new AggregateSum();
+//				break;
+//			case "MIN":
+//				as = new AggregateMin();
+//				break;
+//			case "MAX":
+//				as = new AggregateMax();
+//				break;
+//			case "MUL":
+//				as = new AggregateMul();
+//				break;
+//			case "MEAN":
+//				as = new AggregateMean();
+//				break;
+//			case "LMIN":
+//				as = new AggregateLexiMin();
+//				break;
+//			case "MED":
+//				as = new AggregateMed();
+//				break;
+//			case "LMAX":
+//				as = new AggregateLexiMax();
+//				break;
+//			default:
+//				System.err.println("Error Agregation function \"" + aggregation_function + "\" not handled");
+//				help(options);
+//				return;
+//		}
 		
 		
 		// Calculation of execution time
