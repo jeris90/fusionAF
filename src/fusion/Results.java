@@ -11,7 +11,15 @@ public class Results {
 	}
 	
 	public String printExtensionsEnumeration() {
-		return aggregation_result.toString();
+		String res = new String();
+		
+		res = "[\n\n";
+		
+		for(Collection<String> extension : aggregation_result) {
+			res += " " + extension.toString() + "\n";
+		}
+		res += "]";
+		return res;
 	}
 	
 	public boolean credulousAcceptance(String arg) {
@@ -59,5 +67,4 @@ public class Results {
 		}
 		return res;
 	}
-
 }
