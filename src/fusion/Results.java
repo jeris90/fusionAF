@@ -13,7 +13,7 @@ public class Results {
 	public String printExtensionsEnumeration() {
 		String res = new String();
 		
-		res = "[\n\n";
+		res = "[\n";
 		
 		for(Collection<String> extension : aggregation_result) {
 			res += " " + extension.toString() + "\n";

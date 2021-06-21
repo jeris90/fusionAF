@@ -2,6 +2,7 @@ package fusion.parser;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Vector;
 
@@ -9,22 +10,21 @@ import net.sf.jargsemsat.jargsemsat.datastructures.DungAF;
 
 public abstract class AFParser {
 
-	/**
-	 * Reads an AF from a TGF file. The data read from the file are stored in the
-	 * parameters arguments and attacks.
-	 * 
-	 * @param arguments the Vector<String> where the arguments are stored
-	 * @param attacks   the Vector<String[]> where the attacks are stored
-	 * @param afFile    the tgf file describing the AF
+	/***
+	 * Reads an AF from a TGF file.
+	 * @param afFile	the tgf file describing the AF
+	 * @return a DungAF object
 	 */
-	public static void readingTGF(Vector<String> arguments, Vector<String[]> attacks, String afFile) {
-		arguments.clear();
-		attacks.clear();
+	public static DungAF readingTGF(String afFile) {
+		Vector<String> arguments = new Vector<String>();
+		Vector<String[]> attacks = new Vector<String[]>();
+		
 		String file_arguments = new String();
 		// path to the file to be read
 		String link = new String(afFile);
 		String[] splited = new String[2];
-		Boolean attaque = false;
+		Boolean attack = false;
+		
 		BufferedReader reader;
 
 		try {
@@ -33,10 +33,10 @@ public abstract class AFParser {
 			while (line != null) {
 				try {
 					if (line.equals("#")) {
-						attaque = true;
+						attack = true;
 					} else {
 						file_arguments = line;
-						if (attaque == false) {
+						if (attack == false) {
 							arguments.add(file_arguments);
 						} else {
 							splited = file_arguments.split(" ");
@@ -44,13 +44,16 @@ public abstract class AFParser {
 						}
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("Erreur dans le try : " + line + ".");
+					System.err.println("Error : " + line + ".");
 				}
 				line = reader.readLine();
 			}
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			System.err.println(ex.getMessage() + "Excep 2");
 		}
+		
+		return new DungAF(arguments, attacks);
 
 	}
 
@@ -80,19 +83,31 @@ public abstract class AFParser {
 	 * @return the AFs
 	 */
 	public static Vector<DungAF> readAFDirectory(String afDirectory) {
-		Vector<String> argument = new Vector<String>();
-		Vector<String[]> atts = new Vector<String[]>();
 		Vector<DungAF> afs = new Vector<DungAF>();
 		// Reading Af's files
 		File dir = new File(afDirectory);
+		if(! dir.isDirectory()) { // if the directory does not exist
+			System.err.println("Unknown directory : " + afDirectory);
+			System.exit(1);
+		}
+		
 		File[] liste = dir.listFiles();
+			
 		for (File item : liste) {
 			if (item.isFile()) {
-				readingTGF(argument, atts, item.getAbsolutePath());
-				DungAF af = new DungAF(argument, atts);
+				DungAF af = readingTGF(item.getAbsolutePath());
 				afs.add(af);
 			}
+			else {
+				System.out.println(item.getAbsolutePath() + " is not taken into account because it is not a file. ");
+			}
 		}
+		
+		if(afs.size() == 0) { // if the directory exists but is empty (or contains only directories), the program is stopped
+			System.err.println("The directory " + afDirectory + " is empty or does not contain any file.");
+			System.exit(1);
+		}
+		
 		return afs;
 	}
 

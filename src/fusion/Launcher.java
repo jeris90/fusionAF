@@ -44,22 +44,21 @@ public class Launcher {
 	private static boolean print = false; 
 	
 
+	/***
+	 * Provides the user with the different options available.
+	 * @param options
+	 */
 	public static void help(Options options) {
-		/*System.out.println("Usage: jarfile -dir <af_path> -CI <constrain_path> -D <distance> -AGG <aggregation_function>");
-		System.out.println("\t<af_path>: " + options.getOption("dir").getDescription());
-		System.out.println("\t<constrain_path>: " + options.getOption("CI").getDescription());
-		System.out.println("\t<distance>: " + options.getOption("D").getDescription());
-		System.out.println(
-				"\t<aggregation_function>: " + options.getOption("AGG").getDescription());
-		System.out.println(
-				"The default parameters used are : <distance> = HM, <aggregation_function> = SUM ");*/
-		
 		final HelpFormatter formatter = new HelpFormatter();
 	    formatter.printHelp("jarfile", options, true);
 	    
 	    System.out.println("\nDefault parameters : <distance> = HM, <aggregation_function> = SUM, <output> = EE");
 	}
 	
+	/***
+	 * Create an Options object containing the different available options (short/long option, description, arguments, mandatory or not, etc).
+	 * @return options
+	 */
 	private static Options configParameters() {
 		
 		Option profileDirectoryOption = Option.builder("dir") 
@@ -70,7 +69,7 @@ public class Launcher {
 	            .required(true)
 	            .build();
 		
-		Option constraintFileOption = Option.builder("CI") 
+		Option constraintFileOption = Option.builder("IC") 
 	            .longOpt("int_constraint") //
 	            .desc("Path of the file containing the integrity constraint (dimacs format). If not provided, then the integrity constraint " +
 	            		"is a tautology (i.e. the set of candidates is the power set of the set of arguments).") 
@@ -141,6 +140,11 @@ public class Launcher {
 		return options;
 	}
 	
+	/***
+	 * A method of retrieving the options given by the user and checking whether the options entered are valid or not.
+	 * @param args
+	 * @return Options
+	 */
 	private static Options commandLineManagement(String args[]) {
 		
 		Options options = configParameters();
@@ -156,9 +160,9 @@ public class Launcher {
 				profile_afs = AFParser.readAFDirectory(path_profile);
 			}
 			
-			if (line.hasOption("CI")) {
-				path_constraint = line.getOptionValue("CI");
-				System.out.println("CI : " + path_constraint);
+			if (line.hasOption("IC")) {
+				path_constraint = line.getOptionValue("IC");
+				System.out.println("IC : " + path_constraint);
 			}
 			
 			if (line.hasOption("D")) {
@@ -178,21 +182,22 @@ public class Launcher {
 			
 			
 			if (line.hasOption("a")) {
-				if(!profile_afs.get(0).getArguments().contains(arg)) { // Check if the argument belongs to the set of arguments shared by the profile of AFs
-					System.err.println("Unknown argument for the option -a. \nList of arguments : " + profile_afs.get(0).getArguments());
-					System.exit(1);
-				}
-				
 				if(!line.hasOption("p")) {
-					System.out.println("-a option is omitted because -p option is missing.");
+					System.out.println("-a option is omitted because -p option is missing (default task : EE).");
 				}
 				else {
 					if(line.getOptionValue("p").equals("EE")) {
-						System.out.println("-a option is omitted because -p EE does not need a specific argument.");
+						System.out.println("INFO : -a option is omitted because -p EE (extensions enumeration) does not need a specific argument.");
 					}
 					else {
 						arg = line.getOptionValue("a");
-						System.out.println("Argument : " + arg);
+						if(!profile_afs.get(0).getArguments().contains(arg)) { // Check if the argument belongs to the set of arguments shared by the profile of AFs
+							System.err.println("Unknown argument for the option -a : " + arg + "\nPlease choose among the following list of arguments : " + profile_afs.get(0).getArguments());
+							System.exit(1);
+						}
+						else {
+							System.out.println("Argument : " + arg);
+						}
 					}
 						
 				}
@@ -257,56 +262,13 @@ public class Launcher {
 		
 		// DISTANCE
 		Distance distance = new DistanceFactory().makeDistance(dist);
-//		switch (dist) {
-//			case "HM":
-//				distance = new DistanceHamming();
-//				break;
-//			/*
-//			 * case "LV": distance = new DistanceLevenshtein(); break;
-//			 */
-//			default:
-//				System.err.println("Error distance \"" + dist + "\" not handled. \n");
-//				help(options);
-//				return;
-//		}
 		
 		
 		// AGGREGATION FUNCTION
 		AggregationFunction as = new AggregationFactory().makeAggregation(aggregation_function);
 
-//		switch (aggregation_function) {
-//			case "SUM":
-//				as = new AggregateSum();
-//				break;
-//			case "MIN":
-//				as = new AggregateMin();
-//				break;
-//			case "MAX":
-//				as = new AggregateMax();
-//				break;
-//			case "MUL":
-//				as = new AggregateMul();
-//				break;
-//			case "MEAN":
-//				as = new AggregateMean();
-//				break;
-//			case "LMIN":
-//				as = new AggregateLexiMin();
-//				break;
-//			case "MED":
-//				as = new AggregateMed();
-//				break;
-//			case "LMAX":
-//				as = new AggregateLexiMax();
-//				break;
-//			default:
-//				System.err.println("Error Agregation function \"" + aggregation_function + "\" not handled");
-//				help(options);
-//				return;
-//		}
 		
-		
-		// Calculation of execution time
+		// Execution time
 		long tempsDebut = System.nanoTime();
 		
 		
@@ -341,6 +303,8 @@ public class Launcher {
 		aggregation(models, as);
 		
 
+		
+		// Print results according to a given task (EE, DC or DS)
 		System.out.print("\nResult : \n");	
 		
 		Results result = new Results(vec_candidats);
@@ -357,6 +321,7 @@ public class Launcher {
 			}
 		}
 
+		// Print the execution time
 		long tempsFin = System.nanoTime();
 		double seconds = (tempsFin - tempsDebut) / 1e9;
 		System.out.println();
