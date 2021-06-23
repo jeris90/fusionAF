@@ -48,10 +48,6 @@ public class Models {
 		this.distance.add(distVector);
 	}
 
-	public Vector<Vector<Float>> getDistance() {
-		return this.distance;
-	}
-
 	/**
 	 * This method allows to get the minimal models of the constraint, with
 	 * respect to a vector of scores (that should correspond to the aggregated
@@ -80,9 +76,9 @@ public class Models {
 	/***
 	 * Print the candidate(s) (if it/they exist(s))
 	 */
-	public void printModel() {
-		System.out.print(this.models.size() + " candidate(s) for the aggregation : ");
-		System.out.println(this.models);
+	public void printModel(boolean print) {
+		Print.print(print,this.models.size() + " candidate(s) for the aggregation : ");
+		Print.print(print,this.models.toString() + "\n");
 	}
 	
 
@@ -103,5 +99,9 @@ public class Models {
 			for (int j = 0; j < vect.get(i).size(); j++)
 				transposed.get(j).add(vect.get(i).get(j));
 		return transposed;
+	}
+	
+	public Vector<Vector<Float>> getDistance() {
+		return this.distance;
 	}
 }

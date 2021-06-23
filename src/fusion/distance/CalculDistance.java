@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Vector;
 
 import fusion.Models;
+import fusion.Print;
 import net.sf.jargsemsat.jargsemsat.datastructures.DungAF;
 
 public class CalculDistance {
@@ -52,7 +53,7 @@ public class CalculDistance {
 	 * @param distance
 	 * @param semantic
 	 */
-	public static void computeDistance(DungAF af, Models models, Distance distance, String semantic) {
+	public static void computeDistance(DungAF af, Models models, Distance distance, String semantic, boolean print) {
 		float dist = 0;
 		Object min = null;
 		Vector<Float> vec_distance = new Vector<Float>();
@@ -60,7 +61,7 @@ public class CalculDistance {
 		
 		HashSet<HashSet<String>> extensions = computeExtensions(af,semantic);
 		
-		System.out.println(extensions);
+		Print.print(print, extensions.toString());
 		
 		// browse the models
 		for (Collection<String> current_mod : models.getModels()) {

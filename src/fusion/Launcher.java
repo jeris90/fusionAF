@@ -3,6 +3,7 @@ package fusion;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -23,6 +24,9 @@ import net.sf.jargsemsat.jargsemsat.datastructures.DungAF;
 
 
 public class Launcher {
+	
+	Logger log = Logger.getLogger(Launcher.class.getName());
+	
 	static Vector<Float> resultat = new Vector<>();
 	static Collection<Collection<String>> vec_candidats = new Vector<>();
 	static boolean addMod = true;
@@ -53,6 +57,18 @@ public class Launcher {
 	    formatter.printHelp("jarfile", options, true);
 	    
 	    System.out.println("\nDefault parameters : <distance> = HM, <aggregation_function> = SUM, <output> = EE");
+	}
+	
+	public static void printInformationOptions() {
+		if(print) {
+			System.out.println("PATH : " + path_profile);
+			System.out.println("IC : " + path_constraint);
+			System.out.println("Distance : " + dist);
+			System.out.println("Aggregation function : " + aggregation_function);
+			System.out.println("Task : " + task);
+			System.out.println("Argument : " + arg);
+			System.out.println("\n");
+		}
 	}
 	
 	/***
@@ -154,40 +170,39 @@ public class Launcher {
 		try {
 			line = parser.parse(options, args);
 			
+			if(line.hasOption("print")) {
+				print = true;
+			}
+			
 			if (line.hasOption("dir")) {
 				path_profile = line.getOptionValue("dir");
-				System.out.println("PATH : " + path_profile);
 				profile_afs = AFParser.readAFDirectory(path_profile);
 			}
 			
 			if (line.hasOption("IC")) {
 				path_constraint = line.getOptionValue("IC");
-				System.out.println("IC : " + path_constraint);
 			}
 			
 			if (line.hasOption("D")) {
 				dist = line.getOptionValue("D");
-				System.out.println("Distance : " + dist);
 			}
 			
 			if (line.hasOption("AGG")) {
 				aggregation_function = line.getOptionValue("AGG");
-				System.out.println("Aggregation function : " + aggregation_function);
 			}
 			
 			if (line.hasOption("p")) {
 				task = line.getOptionValue("p");
-				System.out.println("Task : " + task);
 			}
 			
 			
 			if (line.hasOption("a")) {
 				if(!line.hasOption("p")) {
-					System.out.println("-a option is omitted because -p option is missing (default task : EE).");
+					Print.print(print,"-a option is omitted because -p option is missing (default task : EE).");
 				}
 				else {
 					if(line.getOptionValue("p").equals("EE")) {
-						System.out.println("INFO : -a option is omitted because -p EE (extensions enumeration) does not need a specific argument.");
+						Print.print(print,"INFO : -a option is omitted because -p EE (extensions enumeration) does not need a specific argument.");
 					}
 					else {
 						arg = line.getOptionValue("a");
@@ -195,31 +210,25 @@ public class Launcher {
 							System.err.println("Unknown argument for the option -a : " + arg + "\nPlease choose among the following list of arguments : " + profile_afs.get(0).getArguments());
 							System.exit(1);
 						}
-						else {
-							System.out.println("Argument : " + arg);
-						}
 					}
 						
 				}
 			}
 			
-			if(line.hasOption("print")) {
-				print = true;
-				System.out.println("Print details : " + print);
-			}
+			
 			
 			if(line.hasOption("h")) {
 				help(options);
 				System.exit(0);
 			}
 			
-			System.out.println("\n");
+			printInformationOptions();
+			
 			
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			System.err.println("Error parsing command-line arguments!\n");
 			help(options);
-			//e.printStackTrace();
 			System.exit(1);
 		}
 		
@@ -236,7 +245,7 @@ public class Launcher {
 		
 		String sem = fileName_af.substring(fileName_af.lastIndexOf(".") + 1);
 		
-		System.out.format("****************  " + fileName_af + "  *************** \n");
+		Print.print(print,"****************  " + fileName_af + "  ***************");
 		
 		return sem;	
 	}
@@ -245,9 +254,9 @@ public class Launcher {
 		int ind = 0;
 		resultat = agg_function.aggregate(mod);
 
-		System.out.println("\nResults from the chosen aggregation function for each candidate :");
+		Print.print(print,"\nResults from the chosen aggregation function for each candidate :");
 		for (Collection<String> candidate : mod.getModels()) {
-			System.out.println(candidate + " : " + resultat.get(ind));
+			Print.print(print,candidate + " : " + resultat.get(ind));
 			ind++;
 		}
 		
@@ -283,7 +292,7 @@ public class Launcher {
 		
 		Models models = new Models(mod);
 		
-		models.printModel();
+		models.printModel(print);
 		
 		if(models.getModels().isEmpty()) {		// if there are no models, the result of the aggregation is necessarily empty
 			System.out.println("The integrity constraint has no model so the result of the aggregation is empty.");
@@ -297,7 +306,7 @@ public class Launcher {
 			DungAF af = profile_afs.get(j);
 			String semantics = extractSemantics(fileNameAFs.get(j));
 			
-			CalculDistance.computeDistance(af, models, distance, semantics); // compute the distance of each model with a given AF for a given semantics
+			CalculDistance.computeDistance(af, models, distance, semantics, print); // compute the distance of each model with a given AF for a given semantics
 		}
 		
 		aggregation(models, as);
@@ -305,7 +314,7 @@ public class Launcher {
 
 		
 		// Print results according to a given task (EE, DC or DS)
-		System.out.print("\nResult : \n");	
+		Print.print(print,"\nResult : \n");	
 		
 		Results result = new Results(vec_candidats);
 		
@@ -318,13 +327,13 @@ public class Launcher {
 			}
 			else {
 				System.err.println("Unknown argument for the option -p.");
+				System.exit(1);
 			}
 		}
 
 		// Print the execution time
 		long tempsFin = System.nanoTime();
 		double seconds = (tempsFin - tempsDebut) / 1e9;
-		System.out.println();
-		System.out.println("Time : " + seconds + " sec");
+		Print.print(print,"\nTime : " + seconds + " sec");
 	}
 }
