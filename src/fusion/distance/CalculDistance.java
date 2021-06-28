@@ -37,11 +37,14 @@ public class CalculDistance {
 			case "sst":
 				ext = af.getSemiStableExts();
 				break;
+			case "apx":
+			case "tgf":
+				ext = af.getPreferredExts();
+				break;
 			default:
 				System.err.println("Error concerning an unknown extension of a file containing an AF : " + ext);
 				System.exit(1);
 		}
-		
 		return ext;
 	}
 	

@@ -76,8 +76,8 @@ public class Models {
 	 * Print the candidate(s) (if it/they exist(s))
 	 */
 	public void printModel(boolean print) {
-		Print.print(print,this.models.size() + " candidate(s) for the aggregation : ");
-		Print.print(print,this.models.toString() + "\n");
+		Print.print(print,this.models.size() + " candidate(s) for the aggregation.\n");
+		//Print.print(print,this.models.toString() + "\n");
 	}
 	
 

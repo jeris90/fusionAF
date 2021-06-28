@@ -63,6 +63,7 @@ public class Launcher {
 	public static void printInformationOptions() {
 		if(print) {
 			System.out.println("PATH : " + path_profile);
+			System.out.println("INPUT_FORMAT : " + input_format);
 			System.out.println("IC : " + path_constraint);
 			System.out.println("Distance : " + dist);
 			System.out.println("Aggregation function : " + aggregation_function);
@@ -180,6 +181,11 @@ public class Launcher {
 		try {
 			line = parser.parse(options, args);
 			
+			if(line.hasOption("h")) {
+				help(options);
+				System.exit(0);
+			}
+			
 			if(line.hasOption("print")) {
 				print = true;
 			}
@@ -229,13 +235,6 @@ public class Launcher {
 				}
 			}
 			
-			
-			
-			if(line.hasOption("h")) {
-				help(options);
-				System.exit(0);
-			}
-			
 			printInformationOptions();
 			
 			
@@ -266,11 +265,18 @@ public class Launcher {
 
 	public static void aggregation(Models mod, AggregationFunction agg_function) {
 		int ind = 0;
+		
 		resultat = agg_function.aggregate(mod);
+		
+		float min = resultat.get(0);
 
 		Print.print(print,"\nResults from the chosen aggregation function for each candidate :");
+
 		for (Collection<String> candidate : mod.getModels()) {
-			Print.print(print,candidate + " : " + resultat.get(ind));
+			if(min >= resultat.get(ind)) {
+				Print.print(print,candidate + " : " + resultat.get(ind));
+				min = resultat.get(ind);
+			}
 			ind++;
 		}
 		
