@@ -29,11 +29,12 @@ public class Launcher {
 	
 	static Vector<Float> resultat = new Vector<>();
 	static Collection<Collection<String>> vec_candidats = new Vector<>();
-	static boolean addMod = true;
 	
 	private static Vector<DungAF> profile_afs = null;
 	
 	private static String path_profile = null;
+	
+	private static String input_format = null;
 	
 	private static String path_constraint = null;
 	
@@ -82,6 +83,14 @@ public class Launcher {
 	            .desc("[Mandatory] Path of the directory containing the profile of AFs.") 
 	            .hasArg(true) 
 	            .argName("dir_profile")
+	            .required(true)
+	            .build();
+		
+		Option inputFormatOption = Option.builder("f") 
+	            .longOpt("input_format") //
+	            .desc("[Mandatory] Format of the files containing the AFs (apx or tgf).") 
+	            .hasArg(true) 
+	            .argName("input_format")
 	            .required(true)
 	            .build();
 		
@@ -145,6 +154,7 @@ public class Launcher {
 		Options options = new Options();
 		
 		options.addOption(profileDirectoryOption);
+		options.addOption(inputFormatOption);
 		options.addOption(constraintFileOption);
 		options.addOption(distanceOption);
 		options.addOption(aggregationFunctionOption);
@@ -174,9 +184,13 @@ public class Launcher {
 				print = true;
 			}
 			
+			if (line.hasOption("f")) {
+				input_format = line.getOptionValue("f");
+			}
+			
 			if (line.hasOption("dir")) {
 				path_profile = line.getOptionValue("dir");
-				profile_afs = AFParser.readAFDirectory(path_profile);
+				profile_afs = AFParser.readAFDirectory(path_profile,input_format);
 			}
 			
 			if (line.hasOption("IC")) {

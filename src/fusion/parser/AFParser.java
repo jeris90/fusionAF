@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.Scanner;
 import java.util.Vector;
 
 import net.sf.jargsemsat.jargsemsat.datastructures.DungAF;
@@ -57,6 +58,79 @@ public abstract class AFParser {
 
 	}
 
+	/***
+	 * Reads an AF from a APX file.
+	 * @param afFile	the apx file describing the AF
+	 * @return a DungAF object
+	 */
+	public static DungAF readingAPX(String afFile) {
+		Vector<String> arguments = new Vector<String>();
+		Vector<String[]> attacks = new Vector<String[]>();
+		
+		File file = new File(afFile);
+		
+		Scanner reader;
+		try {
+			reader = new Scanner(file);
+			while(reader.hasNextLine()){
+	        	String line = reader.nextLine();
+	        	String command = line.split("\\(") [0];
+	            String res = "";
+	            
+	            if(checkingBeginningCommand(line))
+	                res = line.split("\\(") [1];
+	            
+	            if(checkingEndCommand(line))
+	                res = res.split("\\)") [0];
+	            
+	            if(command.equals("arg")) {
+	            	arguments.add(res);
+	            }
+	            else {
+	            	if(command.equals("att")) {
+	            		if(checkingAttackFormat(res)) {
+	            			String arg1 = res.split(",") [0];
+	                        String arg2 = res.split(",") [1];
+	                        
+	                        if(arguments.contains(arg1) && arguments.contains(arg2)) {
+	                        	attacks.add(res.split(","));
+	                        }
+	                        else {
+	                        	System.err.println("Unknown argument in the file " + afFile + " : " + "(" + arg1 + "," + arg2 + ")");
+	                        	System.exit(1);
+	                        }
+	            		}
+	            	}
+	            	else {
+	            		System.err.println("Unknown line in file " + afFile + " : " + line);
+	            		System.exit(1);
+	            	}
+	            }
+	            
+	        }
+	        reader.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+		return new DungAF(arguments, attacks);
+	}
+	
+    
+    public static Boolean checkingBeginningCommand(String line){
+        return (line.contains("("))? true : false;
+    }
+
+    
+    public static Boolean checkingAttackFormat(String line){
+        return (line.contains(","))? true : false;
+    }
+
+    
+    public static Boolean checkingEndCommand(String line){
+        return (line.contains(")"))? true : false;
+    }
 	
 
 
@@ -82,7 +156,7 @@ public abstract class AFParser {
 	 * @param afDirectory the directory where the AF files are stored
 	 * @return the AFs
 	 */
-	public static Vector<DungAF> readAFDirectory(String afDirectory) {
+	public static Vector<DungAF> readAFDirectory(String afDirectory, String input_format) {
 		Vector<DungAF> afs = new Vector<DungAF>();
 		// Reading Af's files
 		File dir = new File(afDirectory);
@@ -95,11 +169,24 @@ public abstract class AFParser {
 			
 		for (File item : liste) {
 			if (item.isFile()) {
-				DungAF af = readingTGF(item.getAbsolutePath());
+				DungAF af = null;
+				if(input_format.equals("tgf")) {
+					af = readingTGF(item.getAbsolutePath());
+				}
+				else {
+					if(input_format.equals("apx")) {
+						af = readingAPX(item.getAbsolutePath());
+					}
+					else {
+						System.err.println("Unknown format for the option -f (apx or tgf).");
+						System.exit(1);
+					}
+				}
+				//DungAF af = readingAPX(item.getAbsolutePath());
 				afs.add(af);
 			}
 			else {
-				System.out.println(item.getAbsolutePath() + " is not taken into account because it is not a file. ");
+				System.err.println(item.getAbsolutePath() + " is not taken into account because it is not a file. ");
 			}
 		}
 		

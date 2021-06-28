@@ -79,32 +79,6 @@ public class AggregateLexiMin extends AggregationFunction {
 			}
 			result.add(ranking);
 		}
-
-		System.out.println(result);
-
-		/*
-		 * lex2.addAll(vTrans);
-		 * 
-		 * for (int i = 0; i < vTrans.size(); i++) { lex2 = cmpareVec(vTrans.get(i),
-		 * lex2); }
-		 * 
-		 * for (int i = 0; i < vTrans.size(); i++) { for (int j = 0; j < lex2.size();
-		 * j++) { if (vTrans.get(i) == lex2.get(j)) { result.set(i, (float) 0.0); } } }
-		 */
 		return result;
 	}
-
-	/*
-	 * @Override public Vector<Float> choosenAggregate(Models mod) { Vector<Float>
-	 * lex = new Vector<>(); Vector<Vector<Float>> lex2 = new Vector<>();
-	 * Vector<Vector<Float>> vTrans = Models.transpose(mod.getDistance());
-	 * 
-	 * 
-	 * for (int i = 0; i < vTrans.size(); i++) { lex.add((float) 1.0); } for (int j
-	 * = 0; j < vTrans.size(); j++) { Collections.sort(vTrans.get(j)); }
-	 * lex2.addAll(vTrans); for (int i = 0; i < vTrans.size(); i++) { lex2 =
-	 * cmpareVec(vTrans.get(i), lex2); } for (int i = 0; i < vTrans.size(); i++) {
-	 * for (int j = 0; j < lex2.size(); j++) { if (vTrans.get(i) == lex2.get(j)) {
-	 * lex.set(i, (float) 0.0); } } } return lex; }
-	 */
 }
