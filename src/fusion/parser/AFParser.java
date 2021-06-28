@@ -41,6 +41,13 @@ public abstract class AFParser {
 							arguments.add(file_arguments);
 						} else {
 							splited = file_arguments.split(" ");
+							if(arguments.contains(splited[0]) && arguments.contains(splited[0])) {
+	                        	attacks.add(splited);
+	                        }
+	                        else {
+	                        	System.err.println("Unknown argument in the file " + afFile + " : " + "(" + splited[0] + "," + splited[1] + ")");
+	                        	System.exit(1);
+	                        }
 							attacks.add(splited);
 						}
 					}
