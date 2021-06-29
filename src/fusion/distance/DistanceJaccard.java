@@ -23,7 +23,7 @@ public class DistanceJaccard extends Distance {
 			return 0;
 		
 		
-		return 1 - ((float)intersection.size() / (float)union.size());
+		return (float) (1.0 - (intersection.size() / union.size()));
 	}
 
 }

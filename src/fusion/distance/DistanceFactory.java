@@ -9,7 +9,8 @@ public class DistanceFactory extends AbstractDistanceFactory {
 			return new DistanceHamming();
 		case "JC":
 			return new DistanceJaccard();
-
+		case "SD":
+			return new DistanceSorensenDice();
 		default:
 			throw new IllegalArgumentException("The distance " + distance + " does not exist.");
 		}
