@@ -19,36 +19,56 @@ import java.util.Vector;
 
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.reader.DimacsReader;
+import org.sat4j.reader.InstanceReader;
 import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
+import org.sat4j.tools.ModelIterator;
 
 public class ConstraintManager {
+
 
 	/**
 	 * Read the integrity constraint stored in a dimacs file, and returns its models
 	 * 
 	 * @param cnfFile the dimacs file representing the constraint
 	 * @return the models of the constraint
-	 * @throws IOException
 	 */
-	public static Vector<int[]> readConstraint(String cnfFile) throws IOException {
-		String cnf_use_file = "Sat_run.txt";
-		copyOfFile(cnfFile, cnf_use_file);
-		Vector<int[]> modeles = new Vector<>();
-
-		int[] solution = findModel(cnf_use_file);
-		while (solution.length > 0) {
-			modeles.add(solution);
-			String clause = formatCNF(solution);
-			addClause(clause, cnf_use_file);
-			solution = findModel(cnf_use_file);
+	public static Vector<int[]> readConstraint(String cnfFile) {
+		ISolver solver = SolverFactory.newDefault();
+		ModelIterator mi = new ModelIterator(solver);
+		solver.setTimeout(3600); // 1 hour timeout
+		Reader reader = new InstanceReader(mi);
+		Vector<int[]> models = new Vector<int[]>();
+		try {
+			//boolean unsat = true;
+			IProblem problem = reader.parseInstance(cnfFile);
+			while (problem.isSatisfiable()) {
+				//unsat = false;
+				int[] model = problem.model();
+				models.add(model);
+			}
+//			if (unsat) {
+//				// do something for unsat case
+//			}
+		} catch (FileNotFoundException e) {
+			System.out.println("File " + cnfFile + " not found.");
+			System.exit(1);
+		} catch (ParseFormatException e) {
+			e.printStackTrace();
+			System.exit(1);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		} catch (ContradictionException e) {
+			// Nothing to do: the constraint has no model.
+		} catch (TimeoutException e) {
+			System.out.println("Timeout for reading the constraint.");
 		}
-
-		return modeles;
+		return models;
 	}
 
 	/**
@@ -224,30 +244,32 @@ public class ConstraintManager {
 	public static Collection<Collection<String>> getModels(String cnfFile) throws IOException {
 		return transformModels(readConstraint(cnfFile));
 	}
-	
+
 	/***
-	 * Return the power set of a set of arguments. This method is used if no integrity constraint is provided.
+	 * Return the power set of a set of arguments. This method is used if no
+	 * integrity constraint is provided.
+	 * 
 	 * @param setArguments A set of arguments
 	 * @return the power set of setArguments
 	 */
-	public static Collection<Collection<String>> fullModels(Collection<String> setArguments){
+	public static Collection<Collection<String>> fullModels(Collection<String> setArguments) {
 		Collection<Collection<String>> models = new HashSet<Collection<String>>();
-		
-		if(setArguments.isEmpty()) {
+
+		if (setArguments.isEmpty()) {
 			models.add(new HashSet<String>());
 			return models;
 		}
 		List<String> list = new ArrayList<String>(setArguments);
-		
+
 		String head = list.get(0);
-	    Collection<String> rest = new HashSet<String>(list.subList(1, list.size())); 
-	    for (Collection<String> set : fullModels(rest)) {
-	        Set<String> newSet = new HashSet<String>();
-	        newSet.add(head);
-	        newSet.addAll(set);
-	        models.add(newSet);
-	        models.add(set);
-	    }   
+		Collection<String> rest = new HashSet<String>(list.subList(1, list.size()));
+		for (Collection<String> set : fullModels(rest)) {
+			Set<String> newSet = new HashSet<String>();
+			newSet.add(head);
+			newSet.addAll(set);
+			models.add(newSet);
+			models.add(set);
+		}
 		return models;
 	}
 
