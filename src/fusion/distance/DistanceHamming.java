@@ -4,22 +4,19 @@ import java.util.Collection;
 public class DistanceHamming extends Distance {
 
     // Function to calculate the hamming distance 
-    public float computeDistance(Collection<String> Ext, Collection<String> Mod) {
+    public float computeDistance(Collection<String> ext, Collection<String> mod) {
         float difference = 0f;
-        for (String i : Ext) {
-            if (!Mod.contains(i)) {
+        for (String i : ext) {
+            if (!mod.contains(i)) {
                 difference++;
             }
         }
-        for (String i : Mod) {
-            if (!Ext.contains(i)) {
+        for (String i : mod) {
+            if (!ext.contains(i)) {
                 difference++;
             }
         }
 
         return difference;
     }
-
- 
-
 }
