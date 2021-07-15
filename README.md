@@ -20,8 +20,9 @@ jarfile -dir <dir_profile> -f <input_format> [-IC <int_constraint>] [-AGG <agg_f
                                          	profile.[SUM for sum, MIN for minimum, MAX for maximum, MUL for
                                          	multiplication, MEAN for mean, MED for mediane, LMIN for leximin,
                                          	LMAX for leximax]
-	-D,--distance <distance>                Distance used to compare a candidate and a set of extensions. 
-						[HM for the Hamming Distance].
+	-D,--distance <HM|JC|SD>                Distance used to compare a candidate and a set of extensions. 
+						[HM for the Hamming distance, JC for the Jaccard distance,
+						SD for the Sorensen-Dice distance].
 	-p,--output <EE|DC|DS>                  Choice of the task to be carried out by the program. 
 						[EE for extensions enumeration, DC for credulous acceptance for 
 						a given argument, DS for skeptical acceptance for a given argument].
@@ -31,6 +32,22 @@ jarfile -dir <dir_profile> -f <input_format> [-IC <int_constraint>] [-AGG <agg_f
 	
 Default parameters : <distance> = HM, <aggregation_function> = SUM, <output> = EE
 ```
+
+For instance, the following command line allows the user to enumerate all candidates (all compatible with the integration constraint stored in the file *constaint_test.txt*) for the aggregation of the profile of AFs (stored in the directory *test/test2*) using the mean as aggregation function and the haming distance as pseudo-distance :
+
+```
+jarfile -dir test/test2 -f tgf -IC constaint_test.txt -AGG MEAN -D HM -p EE
+```
+
+---
+
+Our code has been deliberately made to be modular. It is thus very easy to implement a new pseudo-distance and/or a new aggregation function. 
+
+To do this, for the pseudo-distance, one must first implement a new class that extends the *Distance* class containing the *computeDistance* method returning a distance between two sets of arguments. Finally, this new distance must be added in the switch of the *DistanceFactory* class to be used. No other class needs to be modified.
+
+The process is the same for adding an aggregation function with the *AggregationFunction* class and the *AggregationFactory* class.
+
+---
 
 Thank you to Akroun Yanis-Fady and Bechroune Lydia for their help.
 
