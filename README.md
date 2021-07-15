@@ -1,13 +1,44 @@
-Ce travail a été réalisé par Akroun Yanis-Fady et Bechroune Lydia
+Code for extension-based approach to merging of AFs
+===================================================
 
-De l'Université de Paris
+Author :
+* Jérôme Delobelle (mailto:jerome.delobelle@u-paris.fr), Université de Paris
+* Jean-Guy Mailly (mailto:jean-guy.mailly@u-paris.fr), Université de Paris
 
-encadré par Jean-Guy Mailly et Jérôme Delobelle.
+Usage:
+```
+jarfile -dir <dir_profile> -f <input_format> [-IC <int_constraint>] [-AGG <agg_function>] [-D <distance>] 
+	[-p <EE|DC|DS>] [-a <argument>]  [-print] [-h] 
+	
+	-dir,--dir_profile <dir_profile>        [Mandatory] Path of the directory containing the profile of AFs.
+	-f,--input_format <apx|tgf>             [Mandatory] Format of the files containing the AFs (apx or tgf).
+	-IC,--int_constraint <int_constraint>   Path of the file containing the integrity constraint (dimacs format). 
+						If not provided, then the integrity constraint is a tautology 
+						(i.e. the set of candidates is the power set of the set of arguments).
+	-AGG,--agg_function <SUM|MIN|MAX|MUL|MEAN|MED|LMIN|LMAX>      Aggregation function used to aggregate the score of a
+                                                candidate and the set of extensions of each AFs in the
+                                         	profile.[SUM for sum, MIN for minimum, MAX for maximum, MUL for
+                                         	multiplication, MEAN for mean, MED for mediane, LMIN for leximin,
+                                         	LMAX for leximax]
+	-D,--distance <distance>                Distance used to compare a candidate and a set of extensions. 
+						[HM for the Hamming Distance].
+	-p,--output <EE|DC|DS>                  Choice of the task to be carried out by the program. 
+						[EE for extensions enumeration, DC for credulous acceptance for 
+						a given argument, DS for skeptical acceptance for a given argument].
+	-a,--arg <argument>                     Option mandatory with the option -p DC or DS to specify the targeted argument.
+	-print                                  Prints all details of the aggregation process.
+	-h,--help                               Help option.
+	
+Default parameters : <distance> = HM, <aggregation_function> = SUM, <output> = EE
+```
 
-Pour la fusion de systèmes d'argumentation basée sur les extensions.
+Thank you to Akroun Yanis-Fady and Bechroune Lydia for their help.
 
 
-Le dossier comporte:
+
+
+
+<!--Le dossier comporte:
 
 -Les différentes classes de notre projet, la classe "Luncher" étant la classe main.
 
@@ -72,3 +103,4 @@ jarfile <af_path> <contrainte_path> <distance> <aggregation_function>
 	LMIN pour LexiMin, 
 	
 	LMAX pour LexiMax.
+-->
