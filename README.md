@@ -23,7 +23,7 @@ jarfile -dir <dir_profile> -f <input_format> [-IC <int_constraint>] [-AGG <agg_f
 	-D,--distance <HM|JC|SD>                Distance used to compare a candidate and a set of extensions. 
 						[HM for the Hamming distance, JC for the Jaccard distance,
 						SD for the Sorensen-Dice distance].
-	-p,--output <EE|DC|DS>                  Choice of the task to be carried out by the program. 
+	-p,--problem <EE|DC|DS>                 Choice of the task to be carried out by the program. 
 						[EE for extensions enumeration, DC for credulous acceptance for 
 						a given argument, DS for skeptical acceptance for a given argument].
 	-a,--arg <argument>                     Option mandatory with the option -p DC or DS to specify the targeted argument.
