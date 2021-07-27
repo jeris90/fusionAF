@@ -123,10 +123,10 @@ public class Launcher {
 	            .build();
 		
 		Option outputFunctionOption = Option.builder("p") 
-	            .longOpt("output") //
+	            .longOpt("problem") //
 	            .desc("Choice of the task to be carried out by the programme (EE for extensions enumeration, DC for credulous acceptance for a given argument, DS for skeptical acceptance for a given argument).") 
 	            .hasArg(true) 
-	            .argName("output")
+	            .argName("problem")
 	            .required(false)
 	            .build();
 		
