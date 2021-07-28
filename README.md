@@ -49,7 +49,7 @@ The process is the same for adding an aggregation function with the *Aggregation
 
 ---
 
-Thank you to Akroun Yanis-Fady and Bechroune Lydia for their help.
+Thanks to Akroun Yanis-Fady and Bechroune Lydia for their help.
 
 
 
