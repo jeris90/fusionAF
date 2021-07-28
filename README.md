@@ -7,7 +7,7 @@ Author :
 
 Usage:
 ```
-jarfile -dir <dir_profile> -f <input_format> [-IC <int_constraint>] [-AGG <agg_function>] [-D <distance>] 
+java -jar jarfile -dir <dir_profile> -f <input_format> [-IC <int_constraint>] [-AGG <agg_function>] [-D <distance>] 
 	[-p <EE|DC|DS>] [-a <argument>]  [-print] [-h] 
 	
 	-dir,--dir_profile <dir_profile>        [Mandatory] Path of the directory containing the profile of AFs.
