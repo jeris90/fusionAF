@@ -55,7 +55,7 @@ public class Launcher {
 	 */
 	public static void help(Options options) {
 		final HelpFormatter formatter = new HelpFormatter();
-	    formatter.printHelp("jarfile", options, true);
+	    formatter.printHelp("java -jar jarfile", options, true);
 	    
 	    System.out.println("\nDefault parameters : <distance> = HM, <aggregation_function> = SUM, <output> = EE");
 	}
