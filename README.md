@@ -39,6 +39,8 @@ For instance, the following command line allows the user to enumerate all candid
 java -jar jarfile -dir test/test2 -f tgf -IC constaint_test.txt -AGG MEAN -D HM -p EE
 ```
 
+![image info](./schema.001.jpeg)
+
 ---
 
 Our code has been deliberately made to be modular. It is thus very easy to implement a new pseudo-distance and/or a new aggregation function. 
