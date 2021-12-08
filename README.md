@@ -33,10 +33,10 @@ java -jar jarfile -dir <dir_profile> -f <input_format> [-IC <int_constraint>] [-
 Default parameters : <distance> = HM, <aggregation_function> = SUM, <output> = EE
 ```
 
-For instance, the following command line allows the user to enumerate all candidates (all compatible with the integration constraint stored in the file *constaint_test.txt*) for the aggregation of the profile of AFs (stored in the directory *test/test2*) using the mean as aggregation function and the haming distance as pseudo-distance :
+For instance, the following command line allows the user to enumerate all candidates (all compatible with the integration constraint stored in the file *constraint.txt*) for the aggregation of the profile of AFs (stored in the directory *profile*) using the sum as aggregation function and the haming distance as pseudo-distance :
 
 ```
-java -jar jarfile -dir test/test2 -f tgf -IC constaint_test.txt -AGG MEAN -D HM -p EE
+java -jar jarfile -dir profile -f tgf -IC constraint.txt -AGG SUM -D HM -p EE
 ```
 
 ![image info](./schema.001.jpeg)
