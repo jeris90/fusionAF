@@ -36,7 +36,7 @@ Default parameters : <distance> = HM, <aggregation_function> = SUM, <output> = E
 For instance, the following command line allows the user to enumerate all candidates (all compatible with the integration constraint stored in the file *constraint.txt*) for the aggregation of the profile of AFs (stored in the directory *profile*) using the sum as aggregation function and the haming distance as pseudo-distance :
 
 ```
-java -jar jarfile -dir profile -f tgf -IC constraint.txt -AGG SUM -D HM -p EE
+java -jar jarfile -dir profile -f cnf -IC constraint.txt -AGG SUM -D HM -p EE
 ```
 
 ![image info](./schema.001.jpeg)
